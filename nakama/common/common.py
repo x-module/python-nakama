@@ -5,6 +5,8 @@ import re
 
 import aiohttp
 
+from nakama.common.nakama import SessionResponse
+
 JWT_REG = re.compile('^([A-Za-z0-9-_=]+)\.([A-Za-z0-9-_=]+)\.?([A-Za-z0-9-_.+/=]*)$')
 
 
@@ -15,7 +17,7 @@ class Common:
         self.user_id = None
         self.vars = None
         self.username = None
-        self._token = None
+        self._session = None
         self._http_url = http_url
         headers = {
             'Accept': 'application/json',
@@ -25,12 +27,13 @@ class Common:
         self.set_basic(server_key)
 
     @property
-    def token(self):
-        return self._token
+    def session(self):
+        return self._session
 
-    @token.setter
-    def token(self, token):
-        self.set_token(token)
+    @session.setter
+    def session(self, session: SessionResponse):
+        self._session = session
+        self.set_token(session.token)
 
     def set_token(self, token):
         p1, p2, p3 = JWT_REG.match(token).groups()

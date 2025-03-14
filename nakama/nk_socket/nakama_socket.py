@@ -31,7 +31,7 @@ class NakamaSocket:
         """
         连接 WebSocket 并启动心跳和消息处理任务
         """
-        url = self._common.http_url + ('/ws?token=%s' % self._common.token)
+        url = self._common.http_url + ('/ws?token=%s' % self._common.session.token)
         async with aiohttp.ClientSession() as session:
             async with session.ws_connect(url) as websocket:
                 print("WebSocket connected")

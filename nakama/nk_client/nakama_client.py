@@ -33,6 +33,10 @@ class NakamaClient(NakamaClientInter):
         return self._rpc
 
     @property
+    def http_url(self):
+        return self._http_uri
+
+    @property
     def account(self):
         return self._account
 

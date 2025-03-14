@@ -8,5 +8,5 @@ class Session:
     def __init__(self, client):
         pass
 
-
-
+    def refresh_session(self):
+        pass

@@ -1,20 +1,25 @@
 # -*- coding: utf-8 -*-
-# -*- coding: utf-8 -*-
 import asyncio
-import time
 
 from nakama import NakamaClient
 
 async def main():
     client = NakamaClient('192.168.1.187', 7350, 'defaultkey')
-    result = await client.account.authenticate.custom("1278888882341234", create=True, username="admin", vars={"aaa": '222'})
-    print(result)
+    # custom 登录
+    # result = await client.account.authenticate.custom("1278888882341234", vars={"aaa": '222'})
+    # print(result.refresh_token)
+    # 邮箱登录
+    result = await client.account.authenticate.email("aaa@aaa.com", "ssssssss", vars={"aaa": '222'})
+    print(result.refresh_token)
+
     # asyncio.create_task(client.socket.connect())
-    client.socket.connect(lambda :print("connected"))
+    client.socket.connect()
+
     account = await client.account.get()
-    print(account)
-    result = await client.rpc("get/goods")
-    print(result)
+    print(account.user.id)
+
+    # result = await client.rpc("get/goods")
+    # print(result)
 
     # 继续执行其他逻辑
     print("WebSocket task started, continuing with other logic...")

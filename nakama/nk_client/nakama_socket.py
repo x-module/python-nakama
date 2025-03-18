@@ -4,8 +4,7 @@ import time
 
 import aiohttp
 
-from ..common.common import Common
-
+from nakama.common.common import Common
 
 class NakamaSocket:
     def __init__(self, common: Common):

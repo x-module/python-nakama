@@ -5,7 +5,7 @@ from .rpc import RPC
 from ..common.common import Common
 from .interface import NakamaClientInter
 from .session import Session
-from ..nk_socket.nakama_socket import NakamaSocket
+from nakama.nk_client.nakama_socket import NakamaSocket
 
 
 class NakamaClient(NakamaClientInter):

@@ -9,19 +9,22 @@ from ..nk_socket.nakama_socket import NakamaSocket
 
 
 class NakamaClient(NakamaClientInter):
-    def __init__(self, host: str, port: int, server_key: str, use_ssl: object = False) -> None:
+    def __init__(self, host: str, server_key: str,port=None) -> None:
         self.host = host
         self.port = port
-        protocol = use_ssl and 'https' or 'http'
-        self._http_uri = f'{protocol}://{self.host}:{self.port}'
-
-        self._session = Session(self)
+        if port is not None:
+            self._http_uri = f'{self.host}:{self.port}'
+        else:
+            self._http_uri =self.host
         self._common = Common(self._http_uri, server_key)
+        self._session = Session(self._common)
         self._account = Account(self._common)
         self._socket = NakamaSocket(self._common)
         self._rpc = RPC(self._common)
 
-    async def close(self):
+    async def logout(self):
+        await self._socket.close()
+        await self._session.logout()
         await self._common.http_session.close()
 
     @property

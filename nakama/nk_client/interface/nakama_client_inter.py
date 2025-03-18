@@ -5,5 +5,5 @@ from abc import ABC, abstractmethod
 class NakamaClientInter(ABC):
 
     @abstractmethod
-    async def close(self):
+    async def logout(self):
         pass

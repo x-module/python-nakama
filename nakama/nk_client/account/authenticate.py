@@ -27,6 +27,7 @@ class Authenticate(object):
         url_path = self._common.http_url + '/v2/account/authenticate/custom'
         result = await   self._common.http_session.post(url_path, params=params, json=body, headers=self._common.auth_header)
         result = await result.json()
+        print("==========result:", result)
         session = SessionResponse()
         session.from_dict(result)
         self._common.session = session

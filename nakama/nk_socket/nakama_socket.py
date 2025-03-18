@@ -9,6 +9,7 @@ from ..common.common import Common
 
 class NakamaSocket:
     def __init__(self, common: Common):
+        self.heartbeat_task = None
         self.ws_listener_task = None
         self.websocket = None
         self._common = common
@@ -35,14 +36,15 @@ class NakamaSocket:
         async with aiohttp.ClientSession() as session:
             async with session.ws_connect(url) as websocket:
                 print("WebSocket connected")
+                self.websocket = websocket
                 # 启动心跳任务
-                heartbeat_task = asyncio.create_task(self.send_heartbeat(websocket))
+                self.heartbeat_task = asyncio.create_task(self.send_heartbeat(websocket))
                 # 启动消息处理任务
-                message_task = asyncio.create_task(self.handle_messages(websocket))
+                self.message_task = asyncio.create_task(self.handle_messages(websocket))
                 try:
                     # 等待任意一个任务完成
                     done, pending = await asyncio.wait(
-                        {heartbeat_task, message_task},
+                        {self.heartbeat_task, self.message_task},
                         return_when=asyncio.FIRST_COMPLETED
                     )
                     # 取消未完成的任务
@@ -91,3 +93,12 @@ class NakamaSocket:
             except Exception as e:
                 print(f"Message handling failed: {e}")
                 break  # 如果发生错误，退出循环
+
+    async def close(self):
+        assert self.websocket is not None, 'You must connect() before close'
+        self.heartbeat_task.cancel()
+        self.heartbeat_task = None
+        self.message_task.cancel()
+        self.message_task = None
+        await self.websocket.close()
+        self.websocket = None

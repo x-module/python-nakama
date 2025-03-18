@@ -80,15 +80,15 @@ class NakamaClient(NakamaClientInter):
 
     # ======================= authenticate ===========================
 
-    async def authenticate_custom(self, id: str, create: bool, username: str, vars: None = None):
+    async def authenticate_custom(self, id: str, create: bool=True, username: str=None, vars: None = None):
         """使用自定义 ID 进行认证"""
         return await self._account.authenticate.custom(id=id, create=create, username=username, vars=vars)
 
-    async def authenticate_device(self, id: str, create: bool, username: str, vars: None = None) -> SessionResponse:
+    async def authenticate_device(self, id: str, create: bool=True, username: str=True, vars: None = None) -> SessionResponse:
         """使用设备进行认证"""
         return await self._account.authenticate.device(id=id, create=create, username=username, vars=vars)
 
-    async def authenticate_email(self, email, password: str, create: bool, username: str = None, vars: None = None) -> SessionResponse:
+    async def authenticate_email(self, email, password: str, create: bool=True, username: str = None, vars: None = None) -> SessionResponse:
         """使用邮箱和密码进行认证"""
         return await self._account.authenticate.email(email=email, password=password, create=create, username=username, vars=vars)
 

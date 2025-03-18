@@ -93,17 +93,17 @@ class NakamaClientInter(ABC):
     # ======================= authenticate ===========================
 
     @abstractmethod
-    async def authenticate_custom(self, id: str, create: bool, username: str, vars: None = None):
+    async def authenticate_custom(self, id: str, create: bool=True, username: str=True, vars: None = None):
         """使用自定义 ID 进行认证"""
         pass
 
     @abstractmethod
-    async def authenticate_device(self, id: str, create: bool, username: str, vars: None = None) -> SessionResponse:
+    async def authenticate_device(self, id: str, create: bool=True, username: str=True, vars: None = None) -> SessionResponse:
         """使用设备 ID 进行认证"""
         pass
 
     @abstractmethod
-    async def authenticate_email(self, email, password: str, create: bool, username: str = None, vars: None = None) -> SessionResponse:
+    async def authenticate_email(self, email, password: str, create: bool=True, username: str = None, vars: None = None) -> SessionResponse:
         """使用邮箱和密码进行认证"""
         pass
 

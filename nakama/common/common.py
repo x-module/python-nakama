@@ -27,7 +27,7 @@ class Common:
         self.set_basic(server_key)
 
     @property
-    def session(self):
+    def session(self)->SessionResponse:
         return self._session
 
     @session.setter

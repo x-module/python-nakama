@@ -1,28 +1,27 @@
 # -*- coding: utf-8 -*-
 import asyncio
+import json
 import time
 
 import aiohttp
 
 from nakama.common.common import Common
+from nakama.common.nakama import NotificationsMsg
+from nakama.utils.log import Logger
+
 
 class NakamaSocket:
     def __init__(self, common: Common):
+        self.message_task = None
         self.heartbeat_task = None
         self.ws_listener_task = None
         self.websocket = None
         self._common = common
+        self.logger = Logger("NakamaSocket")
+        self.message_handler = None
 
-    async def _websocket_listener(self, ws):
-        async for msg in self.websocket:
-            if msg.type == aiohttp.WSMsgType.TEXT:
-                print("Received message:", msg.data)
-            elif msg.type == aiohttp.WSMsgType.CLOSED:
-                print("WebSocket closed")
-                break
-            elif msg.type == aiohttp.WSMsgType.ERROR:
-                print("WebSocket error:", self.websocket.exception())
-                break
+    def set_message_handler(self, message_handler):
+        self.message_handler = message_handler
 
     def connect(self):
         asyncio.create_task(self.connect_websocket())
@@ -34,7 +33,7 @@ class NakamaSocket:
         url = self._common.http_url + ('/ws?token=%s' % self._common.session.token)
         async with aiohttp.ClientSession() as session:
             async with session.ws_connect(url) as websocket:
-                print("WebSocket connected")
+                self.logger.info("WebSocket connected")
                 self.websocket = websocket
                 # 启动心跳任务
                 self.heartbeat_task = asyncio.create_task(self.send_heartbeat(websocket))
@@ -52,13 +51,13 @@ class NakamaSocket:
                         try:
                             await task  # 等待任务取消
                         except asyncio.CancelledError:
-                            print(f"Task {task.get_name()} cancelled")
+                            self.logger.error(f"Task {task.get_name()} cancelled")
                 except Exception as e:
-                    print(f"WebSocket connection failed: {e}")
+                    self.logger.error(f"WebSocket connection failed: {e}")
                 finally:
-                    print("WebSocket connection closed")
+                    self.logger.warning("WebSocket connection closed")
 
-    async def send_heartbeat(self, websocket, interval: int = 10):
+    async def send_heartbeat(self, websocket, interval: int = 30):
         """
         发送 WebSocket 心跳的协程
         :param websocket: WebSocket 连接对象
@@ -66,11 +65,11 @@ class NakamaSocket:
         """
         while True:
             try:
-                print("Sending heartbeat...")
+                self.logger.debug("Sending heartbeat...")
                 await websocket.ping()  # 发送心跳消息
                 await asyncio.sleep(interval)  # 等待指定间隔
             except Exception as e:
-                print(f"Heartbeat failed: {e}")
+                self.logger.error(f"Heartbeat failed: {e}")
                 break  # 如果发生错误，退出循环
 
     async def handle_messages(self, websocket):
@@ -81,16 +80,24 @@ class NakamaSocket:
         while True:
             try:
                 msg = await websocket.receive()  # 接收消息
+
                 if msg.type == aiohttp.WSMsgType.TEXT:
-                    print(f"Received message: {msg.data}")
+                    self.logger.debug(f"Received message: {msg.data}")
+                    notice = NotificationsMsg()
+                    notice.from_dict(json.loads(msg.data)["notifications"])
+                    if self.message_handler:
+                        self.message_handler(notice)
+                    self.logger.info("received notice: {}".format(notice))
                 elif msg.type == aiohttp.WSMsgType.CLOSED:
-                    print("WebSocket closed")
+                    self.logger.debug(f"Received closed message: {msg.data}")
                     break
                 elif msg.type == aiohttp.WSMsgType.ERROR:
-                    print("WebSocket error")
+                    self.logger.debug("WebSocket error")
                     break
+                else:
+                    self.logger.debug(f"Unknown message type: {msg.type}")
             except Exception as e:
-                print(f"Message handling failed: {e}")
+                self.logger.error("Failed to receive message: {}".format(e))
                 break  # 如果发生错误，退出循环
 
     async def close(self):

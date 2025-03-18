@@ -52,22 +52,3 @@ class Authenticate(object):
         self.logger.debug("authenticate.device session response: %s", session)
         return session
 
-    async def apple(self, token, vars=None, create=None, username=None):
-        params = get_params(create=create, username=username)
-        body = {
-            'token': token
-        }
-        self.logger.debug("authenticate.apple login,body: %s", body)
-        session = await authenticate(self._common, '/v2/account/authenticate/apple', params, body, vars)
-        self.logger.debug("authenticate.apple session response: %s", session)
-        return session
-
-    async def steam(self, token, vars=None, create=None, username=None):
-        params = get_params(create=create, username=username)
-        body = {
-            'token': token
-        }
-        self.logger.debug("authenticate.steam login,body: %s", body)
-        session = await authenticate(self._common, '/v2/account/authenticate/steam', params, body, vars)
-        self.logger.debug("authenticate.steam session response: %s", session)
-        return session

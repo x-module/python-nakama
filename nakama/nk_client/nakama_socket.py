@@ -24,7 +24,7 @@ class NakamaSocket:
         self.message_handler = message_handler
 
     def connect(self):
-        asyncio.create_task(self.connect_websocket())
+       return asyncio.create_task(self.connect_websocket())
 
     async def connect_websocket(self):
         """

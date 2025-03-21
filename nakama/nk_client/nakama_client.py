@@ -1,24 +1,23 @@
 # -*- coding: utf-8 -*-
 
 from .account import Account
-from .interface.nakama_client_inter import CreateGroupResponse, LinkGameCenterRequest, UnlinkGameCenterRequest, WriteLeaderboardRecordResponse, WriteTournamentRecordResponse
+from nakama.interface.nakama_client_inter import WriteLeaderboardRecordResponse
 from .leaderboard import Leaderboard
 from .rpc import RPC
 from .storage import Storage
 from .users import Users
 from ..common.common import Common
-from .interface import NakamaClientInter
+from nakama.interface import NakamaClientInter
 from .session import Session
 from nakama.nk_client.nakama_socket import NakamaSocket
 from nakama.common.nakama import (
-    SessionResponse, CreateGroupRequest,
-    UsersResponse, ChannelMessagesRequest, ChannelMessagesResponse,
-    FriendsResponse, FriendsRequest, LeaderboardRecordsResponse, LeaderboardRecordsRequest,
+    SessionResponse, UsersResponse, FriendsResponse, FriendsRequest, LeaderboardRecordsResponse, LeaderboardRecordsRequest,
     MatchesResponse, MatchesRequest, NotificationsRequest,
     NotificationsResponse, StorageObjectsRequest, StorageObjectsResponse, ReadStorageObjectsResponse,
     ReadStorageObjectsRequest, UpdateAccountRequest, WriteLeaderboardRecordRequest,
     WriteStorageObjectsRequest, WriteStorageObjectsResponse, AccountResponse, DeleteStorageObjectsRequest
 )
+from ..interface.notice_handler_inter import NoticeHandlerInter
 
 
 class NakamaClient(NakamaClientInter):
@@ -35,9 +34,6 @@ class NakamaClient(NakamaClientInter):
         self._rpc = RPC(self._common)
         self._storage = Storage(self._common)
         self._leaderboard = Leaderboard(self._common)
-
-    def set_message_handler(self, message_handler):
-        self._socket.set_message_handler(message_handler)
 
     async def logout(self):
         """结束当前会话"""
@@ -81,6 +77,9 @@ class NakamaClient(NakamaClientInter):
     async def account(self) -> AccountResponse:
         """获取当前用户的账户信息"""
         return await self._account.get()
+
+    def set_notice_handler(self, handler: NoticeHandlerInter):
+        self._socket.notice_handler.set_handler(handler)
 
     # ======================= authenticate ===========================
 
@@ -136,7 +135,11 @@ class NakamaClient(NakamaClientInter):
 
     async def rpc(self, id: str, **kwargs):
         """执行远程过程调用（RPC）"""
-        return await self._rpc.call(id, **kwargs)
+        return await self._rpc.socket_call(id, **kwargs)
+
+    async def client_rpc(self, id: str, **kwargs):
+        """执行远程过程调用（RPC）"""
+        return await self._rpc.client_call(id, **kwargs)
 
     async def storage_objects(self, req: StorageObjectsRequest) -> StorageObjectsResponse:
         """获取存储对象"""

@@ -11,7 +11,7 @@ JWT_REG = re.compile('^([A-Za-z0-9-_=]+)\.([A-Za-z0-9-_=]+)\.?([A-Za-z0-9-_.+/=]
 
 
 class Common:
-    def __init__(self, http_url, server_key: str):
+    def __init__(self, http_url, server_key: str,):
         self._auth_header = None
         self.expires = None
         self.user_id = None
@@ -19,6 +19,7 @@ class Common:
         self.username = None
         self._session = None
         self._http_url = http_url
+        self._socket = None
         headers = {
             'Accept': 'application/json',
             'Content-Type': 'application/json'
@@ -71,3 +72,7 @@ class Common:
     @property
     def auth_header(self):
         return self._auth_header
+
+    @property
+    def socket(self):
+        return self._socket

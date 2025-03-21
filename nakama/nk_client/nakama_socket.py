@@ -1,37 +1,35 @@
 # -*- coding: utf-8 -*-
 import asyncio
-import json
-import time
-
-import aiohttp
 
 from nakama.common.common import Common
-from nakama.common.nakama import NotificationsMsg
+from nakama.nk_client.notice_handler import NoticeHandler
+from nakama.nk_client.request_handler import RequestHandler
 from nakama.utils.log import Logger
 
-
 class NakamaSocket:
+
     def __init__(self, common: Common):
         self.message_task = None
         self.heartbeat_task = None
         self.ws_listener_task = None
         self.websocket = None
         self._common = common
+        self._common._socket = self
         self.logger = Logger("NakamaSocket")
-        self.message_handler = None
+        self._notice_handler = NoticeHandler()
+        self._request_handler = RequestHandler()
 
-    def set_message_handler(self, message_handler):
-        self.message_handler = message_handler
+
+    @property
+    def notice_handler(self):
+        return self._notice_handler
 
     def connect(self):
         return asyncio.create_task(self.connect_websocket())
 
     async def send(self, data):
-        # while self.websocket is None:
-        #     await asyncio.sleep(0.1)
         assert self.websocket is not None, 'You must connect() before sending'
         await self.websocket.send_str(data)
-        # await self.websocket.send_bytes(data)
 
     async def connect_websocket(self):
         """
@@ -40,6 +38,7 @@ class NakamaSocket:
         url = self._common.http_url + ('/ws?token=%s' % self._common.session.token)
         self.websocket = await self._common.http_session.ws_connect(url)
         self.logger.debug("WebSocket connected")
+
         loop = asyncio.get_running_loop()
         # 启动心跳任务
         self.heartbeat_task = loop.create_task(self.send_heartbeat(self.websocket))
@@ -69,15 +68,12 @@ class NakamaSocket:
         while True:
             try:
                 msg = await websocket.receive_json()  # 接收消息
-                print("Received message:", msg)
+                self.logger.debug("Received message:%s", msg)
                 if msg.get('cid') is not None:
-                    print("-----msg have cid:", msg.get('cid'))
-                    # cid = msg.pop('cid')
-                    # self.request_handler.handle_result(cid, msg)
+                    self._request_handler.handle_result(msg.pop('cid'), msg)
                 else:
                     for type, event in msg.items():
-                        print("-------msg have not cid,type:", type, " event:", event)
-                        # await self.handlers.handle_event(type, event)
+                        await self._notice_handler.handle_event(type, event)
 
             except Exception as e:
                 self.logger.error("Failed to receive message: {}".format(e))

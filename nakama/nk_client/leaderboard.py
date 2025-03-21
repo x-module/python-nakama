@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 from nakama.common.common import Common
-from nakama.common.nakama import StorageObjectsRequest, DeleteStorageObjectsRequest, WriteStorageObjectsRequest, ReadStorageObjectsRequest, StorageObjectsResponse, ReadStorageObjectsResponse, WriteStorageObjectsResponse, LeaderboardRecordsRequest, LeaderboardRecordsResponse, WriteLeaderboardRecordRequest
-from nakama.nk_client.interface.nakama_client_inter import WriteLeaderboardRecordResponse
-from nakama.utils.helper import post_request, get_request, put_request
+from nakama.common.nakama import LeaderboardRecordsRequest, LeaderboardRecordsResponse, WriteLeaderboardRecordRequest
+from nakama.interface.nakama_client_inter import WriteLeaderboardRecordResponse
+from nakama.utils.helper import post_request, get_request
 
 
 class Leaderboard:

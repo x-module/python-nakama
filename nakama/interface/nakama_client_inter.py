@@ -11,6 +11,7 @@ from nakama.common.nakama import (
     ReadStorageObjectsRequest, UpdateAccountRequest, UpdateGroupRequest, WriteLeaderboardRecordRequest,
     WriteStorageObjectsRequest, WriteTournamentRecordRequest, WriteStorageObjectsResponse, LeaderboardRecord, AccountResponse, DeleteStorageObjectsRequest
 )
+from nakama.interface.notice_handler_inter import NoticeHandlerInter
 
 
 class CreateGroupResponse:
@@ -64,7 +65,7 @@ class NakamaClientInter(ABC):
         pass
 
     @abstractmethod
-    async def session_refresh(self,vars=None):
+    async def session_refresh(self, vars=None):
         """刷新当前会话"""
         pass
 
@@ -86,24 +87,26 @@ class NakamaClientInter(ABC):
     # ======================= account ===========================
 
     @abstractmethod
-    def account(self)-> AccountResponse:
+    def account(self) -> AccountResponse:
         """获取当前用户的账户信息"""
+        pass
+    def set_notice_handler(self, handler: NoticeHandlerInter):
         pass
 
     # ======================= authenticate ===========================
 
     @abstractmethod
-    async def authenticate_custom(self, id: str, create: bool=True, username: str=True, vars: None = None):
+    async def authenticate_custom(self, id: str, create: bool = True, username: str = True, vars: None = None):
         """使用自定义 ID 进行认证"""
         pass
 
     @abstractmethod
-    async def authenticate_device(self, id: str, create: bool=True, username: str=True, vars: None = None) -> SessionResponse:
+    async def authenticate_device(self, id: str, create: bool = True, username: str = True, vars: None = None) -> SessionResponse:
         """使用设备 ID 进行认证"""
         pass
 
     @abstractmethod
-    async def authenticate_email(self, email, password: str, create: bool=True, username: str = None, vars: None = None) -> SessionResponse:
+    async def authenticate_email(self, email, password: str, create: bool = True, username: str = None, vars: None = None) -> SessionResponse:
         """使用邮箱和密码进行认证"""
         pass
 
@@ -150,6 +153,7 @@ class NakamaClientInter(ABC):
     async def unlink_email(self, email, password: str):
         """取消当前用户与邮箱账号的关联"""
         pass
+
     # ======================= friends ===========================
 
     @abstractmethod
@@ -166,7 +170,6 @@ class NakamaClientInter(ABC):
     async def write_leaderboard_record(self, req: WriteLeaderboardRecordRequest) -> WriteLeaderboardRecordResponse:
         """写入排行榜记录"""
         pass
-
 
     @abstractmethod
     def matches(self, req: MatchesRequest) -> MatchesResponse:
@@ -204,8 +207,11 @@ class NakamaClientInter(ABC):
         pass
 
     @abstractmethod
+    async def client_rpc(self, id: str, **kwargs):
+        """执行远程过程调用（RPC）"""
+        pass
+
+    @abstractmethod
     def update_account(self, req: UpdateAccountRequest):
         """更新用户账户信息"""
         pass
-
-

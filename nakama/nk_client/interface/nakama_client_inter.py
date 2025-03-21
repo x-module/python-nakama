@@ -54,7 +54,7 @@ class NakamaClientInter(ABC):
     # ======================= session ===========================
 
     @abstractmethod
-    def session_start(self):
+    async def session_start(self):
         """启动一个新的会话"""
         pass
 

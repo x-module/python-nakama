@@ -24,38 +24,27 @@ class NakamaSocket:
         self.message_handler = message_handler
 
     def connect(self):
-       return asyncio.create_task(self.connect_websocket())
+        return asyncio.create_task(self.connect_websocket())
+
+    async def send(self, data):
+        # while self.websocket is None:
+        #     await asyncio.sleep(0.1)
+        assert self.websocket is not None, 'You must connect() before sending'
+        await self.websocket.send_str(data)
+        # await self.websocket.send_bytes(data)
 
     async def connect_websocket(self):
         """
         连接 WebSocket 并启动心跳和消息处理任务
         """
         url = self._common.http_url + ('/ws?token=%s' % self._common.session.token)
-        async with aiohttp.ClientSession() as session:
-            async with session.ws_connect(url) as websocket:
-                self.logger.info("WebSocket connected")
-                self.websocket = websocket
-                # 启动心跳任务
-                self.heartbeat_task = asyncio.create_task(self.send_heartbeat(websocket))
-                # 启动消息处理任务
-                self.message_task = asyncio.create_task(self.handle_messages(websocket))
-                try:
-                    # 等待任意一个任务完成
-                    done, pending = await asyncio.wait(
-                        {self.heartbeat_task, self.message_task},
-                        return_when=asyncio.FIRST_COMPLETED
-                    )
-                    # 取消未完成的任务
-                    for task in pending:
-                        task.cancel()
-                        try:
-                            await task  # 等待任务取消
-                        except asyncio.CancelledError:
-                            self.logger.error(f"Task {task.get_name()} cancelled")
-                except Exception as e:
-                    self.logger.error(f"WebSocket connection failed: {e}")
-                finally:
-                    self.logger.warning("WebSocket connection closed")
+        self.websocket = await self._common.http_session.ws_connect(url)
+        self.logger.debug("WebSocket connected")
+        loop = asyncio.get_running_loop()
+        # 启动心跳任务
+        self.heartbeat_task = loop.create_task(self.send_heartbeat(self.websocket))
+        # 启动消息处理任务
+        self.message_task = loop.create_task(self.handle_messages(self.websocket))
 
     async def send_heartbeat(self, websocket, interval: int = 30):
         """
@@ -79,23 +68,17 @@ class NakamaSocket:
         """
         while True:
             try:
-                msg = await websocket.receive()  # 接收消息
-
-                if msg.type == aiohttp.WSMsgType.TEXT:
-                    self.logger.debug(f"Received message: {msg.data}")
-                    notice = NotificationsMsg()
-                    notice.from_dict(json.loads(msg.data)["notifications"])
-                    if self.message_handler:
-                        self.message_handler(notice)
-                    self.logger.info("received notice: {}".format(notice))
-                elif msg.type == aiohttp.WSMsgType.CLOSED:
-                    self.logger.debug(f"Received closed message: {msg.data}")
-                    break
-                elif msg.type == aiohttp.WSMsgType.ERROR:
-                    self.logger.debug("WebSocket error")
-                    break
+                msg = await websocket.receive_json()  # 接收消息
+                print("Received message:", msg)
+                if msg.get('cid') is not None:
+                    print("-----msg have cid:", msg.get('cid'))
+                    # cid = msg.pop('cid')
+                    # self.request_handler.handle_result(cid, msg)
                 else:
-                    self.logger.debug(f"Unknown message type: {msg.type}")
+                    for type, event in msg.items():
+                        print("-------msg have not cid,type:", type, " event:", event)
+                        # await self.handlers.handle_event(type, event)
+
             except Exception as e:
                 self.logger.error("Failed to receive message: {}".format(e))
                 break  # 如果发生错误，退出循环

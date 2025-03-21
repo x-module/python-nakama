@@ -2,7 +2,7 @@
 import asyncio
 
 from nakama.common.common import Common
-from nakama.nk_client.notice_handler import NoticeHandler
+from nakama.nk_client.notice_handler import NoticeHandler, DISCONNECT_TYPE
 from nakama.nk_client.request_handler import RequestHandler
 from nakama.utils.log import Logger
 
@@ -66,7 +66,13 @@ class NakamaSocket:
         :param websocket: WebSocket 连接对象
         """
         while True:
+            print("-------------------hand message----------------")
             try:
+                if websocket.closed:
+                    await self._notice_handler.handle_event(DISCONNECT_TYPE, None)
+                    await self.close()
+                    break
+
                 msg = await websocket.receive_json()  # 接收消息
                 self.logger.debug("Received message:%s", msg)
                 if msg.get('cid') is not None:

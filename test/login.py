@@ -28,14 +28,35 @@ async def main():
     await client.session_start()
     print("======================session connected=======================")
 
+    create_party_result = await client.create_party(True, 20)
+    print("create_party_result:", create_party_result.party_id)
     account = await client.account()
     print("account.user.id:", account.user.id)
+
     # await  client.close()
+
+    await asyncio.sleep(5)
     params = {
-        "playerId": account.user.id
+        "partyId": create_party_result.party_id,
+        "members": f"{account.user.id}",
+        "region": "usest-1",
+        "latencyInMs": {
+            "us-west-1": 50,
+            "us-east-1": 110,
+            "eu-central-1": 500,
+            "ap-northeast-1": 500,
+        }
     }
-    result = await client.rpc("check/reconnect/info", **params)
-    print("rpc result:", result)
+    try:
+        res = await client.rpc("swamp/matchmaker/add", **params)
+        print("rpc result:", res)
+    except Exception as e:
+        print("request rpc error:", e)
+
+    print("start to logout......")
+    await asyncio.sleep(5)
+    await  client.session_end()
+    await  client.session_logout()
 
     await asyncio.sleep(10000000000)
 

@@ -44,7 +44,6 @@ class Common:
         pad = len(p2) % 4
         p2 += b"=" * pad  # correct padding
         decoded_token = json.loads(base64.b64decode(p2))
-
         self._token = token
         self.expires = decoded_token['exp']
         self.username = decoded_token['usn']

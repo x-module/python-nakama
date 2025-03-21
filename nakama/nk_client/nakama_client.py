@@ -1,8 +1,10 @@
 # -*- coding: utf-8 -*-
+from typing import Any
 
 from .account import Account
 from nakama.interface.nakama_client_inter import WriteLeaderboardRecordResponse
 from .leaderboard import Leaderboard
+from .party import Party
 from .rpc import RPC
 from .storage import Storage
 from .users import Users
@@ -32,6 +34,7 @@ class NakamaClient(NakamaClientInter):
         self._users = Users(self._common)
         self._socket = NakamaSocket(self._common)
         self._rpc = RPC(self._common)
+        self._party = Party(self._common)
         self._storage = Storage(self._common)
         self._leaderboard = Leaderboard(self._common)
 
@@ -49,6 +52,9 @@ class NakamaClient(NakamaClientInter):
     async def session_start(self):
         """启动一个新的会话"""
         return await self._socket.connect_websocket()
+
+    async def create_party(self, open: bool, max_size: int):
+        return  await self._party.create_party(open, max_size)
 
     # self.connect_websocket()
     def send(self, data):

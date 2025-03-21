@@ -55,6 +55,11 @@ class NakamaClientInter(ABC):
     # ======================= session ===========================
 
     @abstractmethod
+    async def create_party(self, open: bool, max_size: int):
+        """启动一个新的会话"""
+        pass
+
+    @abstractmethod
     async def session_start(self):
         """启动一个新的会话"""
         pass
@@ -90,6 +95,7 @@ class NakamaClientInter(ABC):
     def account(self) -> AccountResponse:
         """获取当前用户的账户信息"""
         pass
+
     def set_notice_handler(self, handler: NoticeHandlerInter):
         pass
 

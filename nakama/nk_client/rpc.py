@@ -24,7 +24,9 @@ class RPC:
         request_waiter = RequestWaiter()
         request_handler = RequestHandler()
         cid = '%d' % request_handler.get_cid()
-        request_handler.add_request(cid,request_waiter)
+        request_handler.add_request(cid, request_waiter)
+
+        kwargs["playerId"] = self._common.user_id
         params = Envelope(
             rpc=RpcMsg(
                 id=id,
@@ -33,4 +35,10 @@ class RPC:
             cid=str(cid),
         )
         await self._common.socket.send(params.to_json())
-        return await request_waiter
+        res = await request_waiter
+        if "error" in res:
+            raise Exception(res["error"])
+
+        result = Envelope()
+        result.from_dict(res)
+        return result.rpc.payload

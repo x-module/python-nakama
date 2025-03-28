@@ -11,7 +11,7 @@ from nakama.common.nakama import (
     ReadStorageObjectsRequest, UpdateAccountRequest, UpdateGroupRequest, WriteLeaderboardRecordRequest,
     WriteStorageObjectsRequest, WriteTournamentRecordRequest, WriteStorageObjectsResponse, LeaderboardRecord, AccountResponse, DeleteStorageObjectsRequest
 )
-from nakama.interface.notice_handler_inter import NoticeHandlerInter
+from nakama.inter.notice_handler_inter import NoticeHandlerInter
 
 
 class CreateGroupResponse:

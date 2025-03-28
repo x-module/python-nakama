@@ -1,2 +1,3 @@
 # -*- coding: utf-8 -*-
-from .nk_client import NakamaClient
+from .client.client import Client
+from .socket.socket import Socket

@@ -1,29 +1,22 @@
 # -*- coding: utf-8 -*-
+from nakama.common.decorator import singleton
+from nakama.common.nakama import Envelope
+
+
 class RequestWaiter:
 
     def __init__(self):
-        self.res = None
+        self.res:Envelope = None
 
-    def __await__(self):
+    def __await__(self)->Envelope:
         while self.res is None:
             yield
         return self.res
 
 
+@singleton
 class RequestHandler:
-    _instance = None  # 单例实例
-
-    def __new__(cls, *args, **kwargs):
-        if not cls._instance:
-            cls._instance = super(RequestHandler, cls).__new__(cls)
-            cls._instance._initialized = False
-        return cls._instance
-
     def __init__(self):
-        if self._initialized:
-            return
-        self._initialized = True
-
         self.cid_count = 0
         self.requests = {}
         self.results = {}

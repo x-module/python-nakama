@@ -15,105 +15,68 @@ class NoticeHandler:
     def set_handler(self, handler: NoticeHandlerInter):
         self._handler = handler
 
-    async def handle_event(self, event: Envelope):
+    async def handle_event(self, msg_type: str, event: Envelope):
+        print("====-=-=-=-" * 50)
+        print(msg_type)
+        print("====-=-=-=-" * 50)
         if self._handler is not None:
-            if event.channel:
+            if msg_type == "channel":
                 await self._handler.channel(event.channel)
-            elif event.channel_join:
-                await self._handler.channel_join(event.channel_join)
-            elif event.channel_leave:
-                await self._handler.channel_leave(event.channel_leave)
-            elif event.channel_message:
-                await self._handler.channel_message(event.channel_message)
-            elif event.channel_message_ack:
-                await self._handler.channel_message_ack(event.channel_message_ack)
-            elif event.channel_message_send:
-                await self._handler.channel_message_send(event.channel_message_send)
-            elif event.channel_message_update:
-                await self._handler.channel_message_update(event.channel_message_update)
-            elif event.channel_message_remove:
-                await self._handler.channel_message_remove(event.channel_message_remove)
-            elif event.channel_presence_event:
-                await self._handler.channel_presence_event(event.channel_presence_event)
-            elif event.error:
-                await self._handler.error(event.error)
-            elif event.match:
-                await self._handler.match(event.match)
-            elif event.match_create:
-                await self._handler.match_create(event.match_create)
-            elif event.match_data:
-                await self._handler.match_data(event.match_data)
-            elif event.match_data_send:
-                await self._handler.match_data_send(event.match_data_send)
-            elif event.match_join:
-                await self._handler.match_join(event.match_join)
-            elif event.match_leave:
-                await self._handler.match_leave(event.match_leave)
-            elif event.match_presence_event:
-                await self._handler.match_presence_event(event.match_presence_event)
-            elif event.matchmaker_add:
-                await self._handler.matchmaker_add(event.matchmaker_add)
-            elif event.matchmaker_matched:
-                await self._handler.matchmaker_matched(event.matchmaker_matched)
-            elif event.matchmaker_remove:
-                await self._handler.matchmaker_remove(event.matchmaker_remove)
-            elif event.matchmaker_ticket:
-                await self._handler.matchmaker_ticket(event.matchmaker_ticket)
-            elif event.notifications:
+            elif msg_type == "notifications":
                 await self._handler.notifications(event.notifications)
-            elif event.rpc:
+            elif msg_type == "rpc":
                 await self._handler.rpc(event.rpc)
-            elif event.status:
+            elif msg_type == "status":
                 await self._handler.status(event.status)
-            elif event.status_follow:
+            elif msg_type == "status_follow":
                 await self._handler.status_follow(event.status_follow)
-            elif event.status_presence_event:
+            elif msg_type == "status_presence_event":
                 await self._handler.status_presence_event(event.status_presence_event)
-            elif event.status_unfollow:
+            elif msg_type == "status_unfollow":
                 await self._handler.status_unfollow(event.status_unfollow)
-            elif event.status_update:
+            elif msg_type == "status_update":
                 await self._handler.status_update(event.status_update)
-            elif event.stream_data:
+            elif msg_type == "stream_data":
                 await self._handler.stream_data(event.stream_data)
-            elif event.stream_presence_event:
+            elif msg_type == "stream_presence_event":
                 await self._handler.stream_presence_event(event.stream_presence_event)
-            elif event.ping:
+            elif msg_type == "ping":
                 await self._handler.ping(event.ping)
-            elif event.pong:
+            elif msg_type == "pong":
                 await self._handler.pong(event.pong)
-            elif event.party:
+            elif msg_type == "party":
                 await self._handler.party(event.party)
-            elif event.party_create:
+            elif msg_type == "party_create":
                 await self._handler.party_create(event.party_create)
-            elif event.party_join:
+            elif msg_type == "party_join":
                 await self._handler.party_join(event.party_join)
-            elif event.party_leave:
+            elif msg_type == "party_leave":
                 await self._handler.party_leave(event.party_leave)
-            elif event.party_promote:
+            elif msg_type == "party_promote":
                 await self._handler.party_promote(event.party_promote)
-            elif event.party_leader:
+            elif msg_type == "party_leader":
                 await self._handler.party_leader(event.party_leader)
-            elif event.party_accept:
+            elif msg_type == "party_accept":
                 await self._handler.party_accept(event.party_accept)
-            elif event.party_remove:
+            elif msg_type == "party_remove":
                 await self._handler.party_remove(event.party_remove)
-            elif event.party_close:
+            elif msg_type == "party_close":
                 await self._handler.party_close(event.party_close)
-            elif event.party_join_request_list:
+            elif msg_type == "party_join_request_list":
                 await self._handler.party_join_request_list(event.party_join_request_list)
-            elif event.party_join_request:
+            elif msg_type == "party_join_request":
                 await self._handler.party_join_request(event.party_join_request)
-            elif event.party_matchmaker_add:
+            elif msg_type == "party_matchmaker_add":
                 await self._handler.party_matchmaker_add(event.party_matchmaker_add)
-            elif event.party_matchmaker_remove:
+            elif msg_type == "party_matchmaker_remove":
                 await self._handler.party_matchmaker_remove(event.party_matchmaker_remove)
-            elif event.party_matchmaker_ticket:
+            elif msg_type == "party_matchmaker_ticket":
                 await self._handler.party_matchmaker_ticket(event.party_matchmaker_ticket)
-            elif event.party_data:
+            elif msg_type == "party_data":
                 await self._handler.party_data(event.party_data)
-            elif event.party_data_send:
+            elif msg_type == "party_data_send":
                 await self._handler.party_data_send(event.party_data_send)
-            elif event.party_presence_event:
+            elif msg_type == "party_presence_event":
                 await self._handler.party_presence_event(event.party_presence_event)
             else:
                 self.logger.warning("Unknown notice event event:%s", event)
@@ -123,150 +86,152 @@ class NoticeHandler:
 
 # 基础消息handler
 class BaseNoticeHandler(NoticeHandlerInter):
+    def __init__(self, parent):
+        self.logger = Logger()
 
     async def channel(self, msg: ChannelMsg):
-        pass
+        self.logger.debug("receive channel:%s", msg)
 
     async def channel_join(self, msg: ChannelJoinMsg):
-        pass
+        self.logger.debug("receive channel_join:%s", msg)
 
     async def channel_leave(self, msg: ChannelLeaveMsg):
-        pass
+        self.logger.debug("receive channel_leave:%s", msg)
 
     async def channel_message(self, msg: ChannelMessage):
-        pass
+        self.logger.debug("receive channel_message:%s", msg)
 
     async def channel_message_ack(self, msg: ChannelMessageAckMsg):
-        pass
+        self.logger.debug("receive channel_message_ack:%s", msg)
 
     async def channel_message_send(self, msg: ChannelMessageSendMsg):
-        pass
+        self.logger.debug("receive channel_message_send:%s", msg)
 
     async def channel_message_update(self, msg: ChannelMessageUpdateMsg):
-        pass
+        self.logger.debug("receive channel_message_update:%s", msg)
 
     async def channel_message_remove(self, msg: ChannelMessageRemoveMsg):
-        pass
+        self.logger.debug("receive channel_message_remove:%s", msg)
 
     async def channel_presence_event(self, msg: ChannelPresenceEventMsg):
-        pass
+        self.logger.debug("receive channel_presence_event:%s", msg)
 
     async def error(self, msg: ErrorMsg):
-        pass
+        self.logger.debug("receive error:%s", msg)
 
     async def match(self, msg: MatchMsg):
-        pass
+        self.logger.debug("receive match:%s", msg)
 
     async def match_create(self, msg: MatchCreateMsg):
-        pass
+        self.logger.debug("receive match_create:%s", msg)
 
     async def match_data(self, msg: MatchDataMsg):
-        pass
+        self.logger.debug("receive match_data:%s", msg)
 
     async def match_data_send(self, msg: MatchDataSendMsg):
-        pass
+        self.logger.debug("receive match_data_send:%s", msg)
 
     async def match_join(self, msg: MatchJoinMsg):
-        pass
+        self.logger.debug("receive match_join:%s", msg)
 
     async def match_leave(self, msg: MatchLeaveMsg):
-        pass
+        self.logger.debug("receive match_leave:%s", msg)
 
     async def match_presence_event(self, msg: MatchPresenceEventMsg):
-        pass
+        self.logger.debug("receive match_presence_event:%s", msg)
 
     async def matchmaker_add(self, msg: MatchmakerAddMsg):
-        pass
+        self.logger.debug("receive matchmaker_add:%s", msg)
 
     async def matchmaker_matched(self, msg: MatchmakerMatchedMsg):
-        pass
+        self.logger.debug("receive matchmaker_matched:%s", msg)
 
     async def matchmaker_remove(self, msg: MatchmakerRemoveMsg):
-        pass
+        self.logger.debug("receive matchmaker_remove:%s", msg)
 
     async def matchmaker_ticket(self, msg: MatchmakerTicketMsg):
-        pass
+        self.logger.debug("receive matchmaker_ticket:%s", msg)
 
     async def notifications(self, msg: NotificationsMsg):
-        pass
+        self.logger.debug("receive notifications:%s", msg)
 
     async def rpc(self, msg: RpcMsg):
-        pass
+        self.logger.debug("receive rpc:%s", msg)
 
     async def status(self, msg: StatusMsg):
-        pass
+        self.logger.debug("receive status:%s", msg)
 
     async def status_follow(self, msg: StatusFollowMsg):
-        pass
+        self.logger.debug("receive status_follow:%s", msg)
 
     async def status_presence_event(self, msg: StatusPresenceEventMsg):
-        pass
+        self.logger.debug("receive status_presence_event:%s", msg)
 
     async def status_unfollow(self, msg: StatusUnfollowMsg):
-        pass
+        self.logger.debug("receive status_unfollow:%s", msg)
 
     async def status_update(self, msg: StatusUpdateMsg):
-        pass
+        self.logger.debug("receive status_update:%s", msg)
 
     async def stream_data(self, msg: StreamDataMsg):
-        pass
+        self.logger.debug("receive stream_data:%s", msg)
 
     async def stream_presence_event(self, msg: StreamPresenceEventMsg):
-        pass
+        self.logger.debug("receive stream_presence_event:%s", msg)
 
     async def ping(self, msg: PingMsg):
-        pass
+        self.logger.debug("receive ping:%s", msg)
 
     async def pong(self, msg: PongMsg):
-        pass
+        self.logger.debug("receive pong:%s", msg)
 
     async def party(self, msg: PartyMsg):
-        pass
+        self.logger.debug("receive party:%s", msg)
 
     async def party_create(self, msg: PartyCreateMsg):
-        pass
+        self.logger.debug("receive party_create:%s", msg)
 
     async def party_join(self, msg: PartyJoinMsg):
-        pass
+        self.logger.debug("receive party_join:%s", msg)
 
     async def party_leave(self, msg: PartyLeaveMsg):
-        pass
+        self.logger.debug("receive party_leave:%s", msg)
 
     async def party_promote(self, msg: PartyPromoteMsg):
-        pass
+        self.logger.debug("receive party_promote:%s", msg)
 
     async def party_leader(self, msg: PartyLeaderMsg):
-        pass
+        self.logger.debug("receive party_leader:%s", msg)
 
     async def party_accept(self, msg: PartyAcceptMsg):
-        pass
+        self.logger.debug("receive party_accept:%s", msg)
 
     async def party_remove(self, msg: PartyRemoveMsg):
-        pass
+        self.logger.debug("receive party_remove:%s", msg)
 
     async def party_close(self, msg: PartyCloseMsg):
-        pass
+        self.logger.debug("receive party_close:%s", msg)
 
     async def party_join_request_list(self, msg: PartyJoinRequestsMsg):
-        pass
+        self.logger.debug("receive party_join_request_list:%s", msg)
 
     async def party_join_request(self, msg: PartyJoinRequestMsg):
-        pass
+        self.logger.debug("receive party_join_request:%s", msg)
 
     async def party_matchmaker_add(self, msg: PartyMatchmakerAddMsg):
-        pass
+        self.logger.debug("receive party_matchmaker_add:%s", msg)
 
     async def party_matchmaker_remove(self, msg: PartyMatchmakerRemoveMsg):
-        pass
+        self.logger.debug("receive party_matchmaker_remove:%s", msg)
 
     async def party_matchmaker_ticket(self, msg: PartyMatchmakerTicketMsg):
-        pass
+        self.logger.debug("receive party_matchmaker_ticket:%s", msg)
 
     async def party_data(self, msg: PartyDataMsg):
-        pass
+        self.logger.debug("receive party_data:%s", msg)
 
     async def party_data_send(self, msg: PartyDataSendMsg):
-        pass
+        self.logger.debug("receive party_data_send:%s", msg)
 
     async def party_presence_event(self, msg: PartyPresenceEventMsg):
-        pass
+        self.logger.debug("receive party_presence_event:%s", msg)

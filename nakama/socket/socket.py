@@ -82,12 +82,19 @@ class Socket:
         ]
         try:
             async for message in self._websocket:
+                self.logger.debug("]received source message:%s", message)
                 envelope = Envelope().from_json(message)
-                self.logger.debug("received message:%s", envelope)
+                # 获取当前设置的消息类型
+
+                self.logger.debug("[%s]received message:%s", envelope.cid, envelope.notifications)
                 if envelope.cid:
                     self._request_handler.handle_result(envelope.cid, envelope)
                 else:
-                    await self._notice_handler.handle_event(envelope)
+                    msg = json.loads(message)
+
+                    for msg_type in msg.keys():
+                        print(f"-------msg_type--------:{msg_type}")
+                        await self._notice_handler.handle_event(msg_type, envelope)
 
         except websockets.exceptions.ConnectionClosed as e:
             self.logger.warning(f"服务器主动关闭连接: {e}")

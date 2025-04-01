@@ -51,9 +51,6 @@ async def main():
     # }
     # create_match_result= await socket.rpc.call("swamp/matchmaker/add", params)
     # print("create_match_result:", create_match_result)
-
-
-
     await asyncio.sleep(100000)
 
 

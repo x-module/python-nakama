@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 from nakama.common.nakama import ChannelMsg, PartyPresenceEventMsg
-from nakama.inter.notice_handler_inter import NoticeHandlerInter
 from nakama.socket.notice_handler import BaseNoticeHandler
 
 

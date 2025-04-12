@@ -12,7 +12,7 @@ from nakama.socket.notice_handler import NoticeHandler
 from nakama.socket.party import Party
 from nakama.socket.request_handler import RequestHandler
 from nakama.socket.rpc import Rpc
-from nakama.utils.log import Logger
+from common.Logger import Logger
 
 
 class Socket:

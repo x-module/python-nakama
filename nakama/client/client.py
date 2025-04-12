@@ -3,6 +3,7 @@ import base64
 from typing import Optional, Any
 
 import requests
+from common.Logger import Logger
 
 from nakama.client.account import Account
 from nakama.client.authenticate import Authenticate
@@ -12,7 +13,6 @@ from nakama.client.storage import Storage
 from nakama.common.nakama import SessionResponse
 from nakama.client.link import Link
 from nakama.client.unlink import Unlink
-from nakama.utils.log import Logger
 
 
 class Client(object):

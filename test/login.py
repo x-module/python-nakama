@@ -11,10 +11,10 @@ from test.notice_handdler import NoticeHandler
 
 async def main():
     client = Client(
-        # host="showdown-dev-02.us-east1.nakamacloud.io",
-        # port=443,
-        # server_key="wgAPTyg14PXiWwGn",
-        # ssl=True
+        host="showdown-dev-02.us-east1.nakamacloud.io",
+        port=443,
+        server_key="wgAPTyg14PXiWwGn",
+        ssl=True
     )
     # result =  client.authenticate.email(email="aaaa@ssss.com",password="aaaa@ssss.com")
     result =  client.authenticate.custom(AccountCustom(

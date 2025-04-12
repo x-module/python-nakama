@@ -86,7 +86,7 @@ class NoticeHandler:
 
 # 基础消息handler
 class BaseNoticeHandler(NoticeHandlerInter):
-    def __init__(self, parent):
+    def __init__(self):
         self.logger = Logger()
 
     async def channel(self, msg: ChannelMsg):

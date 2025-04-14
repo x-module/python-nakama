@@ -3,7 +3,7 @@ import base64
 from typing import Optional, Any
 
 import requests
-from common.Logger import Logger
+from tools.logger import Logger
 
 from nakama.client.account import Account
 from nakama.client.authenticate import Authenticate

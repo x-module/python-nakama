@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
-from nakama.common.decorator import singleton
+from tools.decorator import singleton
+
 from nakama.common.nakama import Envelope
 
 

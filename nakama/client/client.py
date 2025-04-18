@@ -18,7 +18,7 @@ from nakama.client.unlink import Unlink
 class Client(object):
     def __init__(
             self,
-            host: str = "192.168.1.187",
+            host: str = "192.168.1.190",
             port: int = 7350,
             server_key: str = "defaultkey",
             ssl: bool = False

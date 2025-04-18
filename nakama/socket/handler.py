@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
-from tools.decorator import singleton
+import time
+from typing import Any, Generator
 
 from nakama.common.nakama import Envelope
 
@@ -7,15 +8,13 @@ from nakama.common.nakama import Envelope
 class RequestWaiter:
 
     def __init__(self):
-        self.res:Envelope = None
+        self.res: Envelope = None
 
-    def __await__(self)->Envelope:
-        while self.res is None:
-            yield
+    def result(self):
+        while not self.res:
+            time.sleep(0.01)
         return self.res
 
-
-@singleton
 class RequestHandler:
     def __init__(self):
         self.cid_count = 0
@@ -43,3 +42,6 @@ class RequestHandler:
         else:
             waiter.res = result
             del self.requests[cid]
+
+
+request_handler = RequestHandler()

@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+import json
 from typing import Any
 
 from nakama.common.nakama import Envelope, StorageObjectsResponse

@@ -48,29 +48,29 @@ class NakamaClientInter(ABC):
         pass
 
     @abstractmethod
-    async def token(self):
+    def token(self):
         """获取当前用户的令牌"""
         pass
 
     # ======================= session ===========================
 
     @abstractmethod
-    async def create_party(self, open: bool, max_size: int):
+    def create_party(self, open: bool, max_size: int):
         """启动一个新的会话"""
         pass
 
     @abstractmethod
-    async def session_start(self):
+    def session_start(self):
         """启动一个新的会话"""
         pass
 
     @abstractmethod
-    async def session_end(self):
+    def session_end(self):
         """结束当前会话"""
         pass
 
     @abstractmethod
-    async def session_refresh(self, vars=None):
+    def session_refresh(self, vars=None):
         """刷新当前会话"""
         pass
 
@@ -102,61 +102,61 @@ class NakamaClientInter(ABC):
     # ======================= authenticate ===========================
 
     @abstractmethod
-    async def authenticate_custom(self, id: str, create: bool = True, username: str = True, vars: None = None):
+    def authenticate_custom(self, id: str, create: bool = True, username: str = True, vars: None = None):
         """使用自定义 ID 进行认证"""
         pass
 
     @abstractmethod
-    async def authenticate_device(self, id: str, create: bool = True, username: str = True, vars: None = None) -> SessionResponse:
+    def authenticate_device(self, id: str, create: bool = True, username: str = True, vars: None = None) -> SessionResponse:
         """使用设备 ID 进行认证"""
         pass
 
     @abstractmethod
-    async def authenticate_email(self, email, password: str, create: bool = True, username: str = None, vars: None = None) -> SessionResponse:
+    def authenticate_email(self, email, password: str, create: bool = True, username: str = None, vars: None = None) -> SessionResponse:
         """使用邮箱和密码进行认证"""
         pass
 
     # ======================= group ===========================
 
     @abstractmethod
-    async def users(self, ids: str) -> UsersResponse:
+    def users(self, ids: str) -> UsersResponse:
         """根据用户 ID 列表获取用户信息"""
         pass
 
     @abstractmethod
-    async def users_usernames(self, usernames: str) -> UsersResponse:
+    def users_usernames(self, usernames: str) -> UsersResponse:
         """根据用户名列表获取用户信息"""
         pass
 
     # ======================= link ===========================
 
     @abstractmethod
-    async def link_custom(self, id: str):
+    def link_custom(self, id: str):
         """将自定义 ID 与当前用户关联"""
         pass
 
     @abstractmethod
-    async def link_device(self, id: str):
+    def link_device(self, id: str):
         """将设备 ID 与当前用户关联"""
         pass
 
     @abstractmethod
-    async def link_email(self, email, password: str):
+    def link_email(self, email, password: str):
         """将邮箱账号与当前用户关联"""
         pass
 
     @abstractmethod
-    async def unlink_custom(self, id: str):
+    def unlink_custom(self, id: str):
         """取消当前用户与自定义 ID 的关联"""
         pass
 
     @abstractmethod
-    async def unlink_device(self, id: str):
+    def unlink_device(self, id: str):
         """取消当前用户与设备 ID 的关联"""
         pass
 
     @abstractmethod
-    async def unlink_email(self, email, password: str):
+    def unlink_email(self, email, password: str):
         """取消当前用户与邮箱账号的关联"""
         pass
 
@@ -168,12 +168,12 @@ class NakamaClientInter(ABC):
         pass
 
     @abstractmethod
-    async def leaderboard_records(self, req: LeaderboardRecordsRequest) -> LeaderboardRecordsResponse:
+    def leaderboard_records(self, req: LeaderboardRecordsRequest) -> LeaderboardRecordsResponse:
         """获取排行榜记录"""
         pass
 
     @abstractmethod
-    async def write_leaderboard_record(self, req: WriteLeaderboardRecordRequest) -> WriteLeaderboardRecordResponse:
+    def write_leaderboard_record(self, req: WriteLeaderboardRecordRequest) -> WriteLeaderboardRecordResponse:
         """写入排行榜记录"""
         pass
 
@@ -188,32 +188,32 @@ class NakamaClientInter(ABC):
         pass
 
     @abstractmethod
-    async def storage_objects(self, req: StorageObjectsRequest) -> StorageObjectsResponse:
+    def storage_objects(self, req: StorageObjectsRequest) -> StorageObjectsResponse:
         """获取存储对象"""
         pass
 
     @abstractmethod
-    async def read_storage_objects(self, req: ReadStorageObjectsRequest) -> ReadStorageObjectsResponse:
+    def read_storage_objects(self, req: ReadStorageObjectsRequest) -> ReadStorageObjectsResponse:
         """读取存储对象"""
         pass
 
     @abstractmethod
-    async def write_storage_objects(self, req: WriteStorageObjectsRequest) -> WriteStorageObjectsResponse:
+    def write_storage_objects(self, req: WriteStorageObjectsRequest) -> WriteStorageObjectsResponse:
         """写入存储对象"""
         pass
 
     @abstractmethod
-    async def delete_storage_objects(self, req: DeleteStorageObjectsRequest) -> WriteStorageObjectsResponse:
+    def delete_storage_objects(self, req: DeleteStorageObjectsRequest) -> WriteStorageObjectsResponse:
         """写入存储对象"""
         pass
 
     @abstractmethod
-    async def rpc(self, id: str, **kwargs):
+    def rpc(self, id: str, **kwargs):
         """执行远程过程调用（RPC）"""
         pass
 
     @abstractmethod
-    async def client_rpc(self, id: str, **kwargs):
+    def client_rpc(self, id: str, **kwargs):
         """执行远程过程调用（RPC）"""
         pass
 

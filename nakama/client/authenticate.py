@@ -51,7 +51,7 @@ class Authenticate:
         self._client.session = SessionResponse().from_dict(result)
         return self._client.session
 
-    async def logout(self):
+    def logout(self):
         payload = {
             'token': self._client.session.token
         }
@@ -64,7 +64,7 @@ class Authenticate:
         if envelope.error.code != 0:
             raise envelope.error
 
-    async def refresh(self, vars=None):
+    def refresh(self, vars=None):
         payload = {
             'token': self._client.session.refresh_token
         }

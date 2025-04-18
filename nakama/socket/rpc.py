@@ -27,23 +27,3 @@ class Rpc:
         if envelope.error.code:
             raise Exception(envelope.error)
         return json.loads(envelope.rpc.payload)
-
-    #
-    #
-    # def call(self, func: str, kwargs:dict[str:Any]={}):
-    #     request_waiter = RequestWaiter()
-    #     cid = '%d' % request_handler.get_cid()
-    #     request_handler.add_request(cid, request_waiter)
-    #     params = Envelope(
-    #         rpc=RpcMsg(
-    #             id=func,
-    #             payload=json.dumps(kwargs),
-    #         ),
-    #         cid=str(cid),
-    #     )
-    #     self._socket.websocket.send(params.to_json())
-    #     envelope = request_waiter
-    #     print("-------------call rpc------------:", envelope.to_json())
-    #     if envelope.error.code:
-    #         raise Exception(envelope.error)
-    #     return json.loads(envelope.rpc.payload)

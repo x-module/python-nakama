@@ -10,10 +10,9 @@ hyperframe==6.1.0
 idna==3.10
 multidict==6.4.3
 py==1.11.0
--e git+ssh://git@github.com/x-module/python-utils.git@26958961272c5939f34c37ddaf2385f267ecbfa4#egg=python_utils
 requests==2.32.3
 retry==0.9.2
 setuptools==78.1.0
 stringcase==1.2.0
-urllib3==2.4.0
+urllib3==1.26.20
 websocket-client==1.8.0

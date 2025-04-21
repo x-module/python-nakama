@@ -27,9 +27,9 @@ def main():
     account = client.account.get()
     print("账号信息:", account.to_json())
 
-    notice_handler = NoticeHandler()
+    noticeHandler = NoticeHandler()
     socket = Socket(client)
-    socket.set_notice_handler(notice_handler)
+    socket.setNoticeHandler(noticeHandler)
     socket.connect()
 
     print("----------------后续操作-----------------")

@@ -4,7 +4,7 @@ from retry import retry
 from nakama.common.nakama import Envelope, AccountResponse
 
 
-class Account():
+class Account:
     def __init__(self, client):
         self._client = client
 

@@ -41,9 +41,9 @@ class Client(object):
         self.storage = Storage(self)
         self.rpc = Rpc(self)
 
-        self._init_app()
+        self.initApp()
 
-    def _init_app(self):
+    def initApp(self):
         self._headers = {"Authorization": f"Basic {base64.b64encode(self._server_key.encode()).decode()}"}
 
     def request(self, method: str, endpoint: str, params: Optional[dict] = None, payload: Optional[dict[str, Any]] = None) -> dict[str, Any]:
@@ -68,6 +68,8 @@ class Client(object):
         self._headers = {
             'Authorization': 'Bearer %s' % session.token
         }
+    def logout(self):
+        self.authenticate.logout()
 
     @property
     def base_url(self):

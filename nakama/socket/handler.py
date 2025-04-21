@@ -15,19 +15,20 @@ class RequestWaiter:
             time.sleep(0.01)
         return self.res
 
+
 class RequestHandler:
     def __init__(self):
         self.cid_count = 0
         self.requests = {}
         self.results = {}
 
-    def get_cid(self) -> int:
+    def getCid(self) -> int:
         if len(self.requests.keys()) == 0:
             self.cid_count = 0
         self.cid_count += 1
         return self.cid_count
 
-    def add_request(self, cid: str, request: RequestWaiter):
+    def addRequest(self, cid: str, request: RequestWaiter):
         res = self.results.get(cid)
         if res is None:
             self.requests[cid] = request
@@ -35,7 +36,7 @@ class RequestHandler:
             request.res = res
             del self.results[cid]
 
-    def handle_result(self, cid: str, result):
+    def handleResult(self, cid: str, result):
         waiter = self.requests[cid]
         if waiter is None:
             self.results[cid] = result
@@ -44,4 +45,4 @@ class RequestHandler:
             del self.requests[cid]
 
 
-request_handler = RequestHandler()
+requestHandler = RequestHandler()

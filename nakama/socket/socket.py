@@ -10,7 +10,7 @@ from nakama.common.nakama import Envelope, NotificationsMsg, Notification
 from nakama.inter.notice_handler_inter import NoticeHandlerInter
 from nakama.socket.notice_handler import NoticeHandler
 from nakama.socket.party import Party
-from nakama.socket.handler import request_handler
+from nakama.socket.handler import requestHandler
 from nakama.socket.rpc import Rpc
 from tools.logger import Logger
 import websocket
@@ -25,14 +25,12 @@ class Socket:
         self._client = client
         self._websocket = None
         self._callbacks: Dict[str, Callable] = {}
-        self.ping_interval = 20  # 心跳间隔(秒)
-        self.retry_interval = 5  # 重连间隔(秒)
         self.rpc = Rpc(self)
         self.party = Party(self)
 
         self.logger = Logger(__name__)
         self.active = False
-        self._notice_handler = NoticeHandler()
+        self._noticeHandler = NoticeHandler()
         self.connected = False
 
     @property
@@ -40,38 +38,38 @@ class Socket:
         return self._websocket
 
     @property
-    def ws_url(self) -> str:
+    def wsUrl(self) -> str:
         protocol = "wss" if self._ssl else "ws"
         return f"{protocol}://{self._host}:{self._port}/ws"
 
-    def set_notice_handler(self, handler: NoticeHandlerInter):
-        self._notice_handler.set_handler(handler)
+    def setNoticeHandler(self, handler: NoticeHandlerInter):
+        self._noticeHandler.set_handler(handler)
 
-    def on_open(self, ws):
-        self.logger.debug("[%s]连接成功!", self.ws_url)
+    def onOpen(self, ws):
+        self.logger.debug("[%s]连接成功!", self.wsUrl)
         self.connected = True
         # 状态检测线程
         self.active = True
         threading.Thread(target=self.monitor).start()
 
-    def on_error(self, ws, error):
+    def onError(self, ws, error):
         print("on_error", error)
 
-    def on_close(self, ws, close_status_code, close_msg):
-        self.logger.debug("[%s]连接关闭!", self.ws_url)
+    def onClose(self, ws, close_status_code, close_msg):
+        self.logger.debug("[%s]连接关闭!", self.wsUrl)
         self.active = False
 
-    def on_message(self, ws, message):
+    def onMessage(self, ws, message):
         self.logger.debug("接收到原始消息:%s", message)
         envelope = Envelope().from_json(message)
         # 获取当前设置的消息类型
         self.logger.debug("[%s]接受解析后消息:%s", envelope.cid, envelope.notifications)
         if envelope.cid:
-            request_handler.handle_result(envelope.cid, envelope)
+            requestHandler.handleResult(envelope.cid, envelope)
         else:
             msg = json.loads(message)
             for msg_type in msg.keys():
-                self._notice_handler.handle_event(msg_type, envelope)
+                self._noticeHandler.handle_event(msg_type, envelope)
 
     def connect(self):
         threading.Thread(target=self._connect).start()
@@ -79,14 +77,14 @@ class Socket:
             time.sleep(1)
 
     def _connect(self):
-        self.logger.debug("[%s]连接中...", self.ws_url)
+        self.logger.debug("[%s]连接中...", self.wsUrl)
         if not self._websocket:
-            self._websocket = websocket.WebSocketApp(self.ws_url,
-                                                     on_open=self.on_open,
-                                                     on_message=self.on_message,
-                                                     on_error=self.on_error,
+            self._websocket = websocket.WebSocketApp(self.wsUrl,
+                                                     on_open=self.onOpen,
+                                                     on_message=self.onMessage,
+                                                     on_error=self.onError,
                                                      header={"Authorization": f"Bearer {self._token}"},
-                                                     on_close=self.on_close)
+                                                     on_close=self.onClose)
         self._websocket.run_forever(reconnect=1)
 
     def monitor(self):

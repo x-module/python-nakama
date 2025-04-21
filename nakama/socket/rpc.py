@@ -3,7 +3,7 @@ import json
 from typing import Any
 
 from nakama.common.nakama import Envelope, RpcMsg
-from nakama.socket.handler import RequestWaiter, request_handler
+from nakama.socket.handler import RequestWaiter, requestHandler
 
 
 class Rpc:
@@ -12,8 +12,8 @@ class Rpc:
 
     def __call__(self, *args, **kwargs):
         request_waiter = RequestWaiter()
-        cid = '%d' % request_handler.get_cid()
-        request_handler.add_request(cid, request_waiter)
+        cid = '%d' % requestHandler.getCid()
+        requestHandler.addRequest(cid, request_waiter)
         params = Envelope(
             rpc=RpcMsg(
                 id=args[0],

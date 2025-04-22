@@ -17,13 +17,14 @@ class Rpc:
         params = Envelope(
             rpc=RpcMsg(
                 id=args[0],
-                payload=json.dumps(kwargs),
+                payload=json.dumps(args[1]),
             ),
             cid=str(cid),
         )
+        print("-------------call rpc params ------------:", params.rpc)
         self._socket.websocket.send(params.to_json())
         envelope = request_waiter.result()
-        print("-------------call rpc------------:", envelope.to_json())
+        print("-------------call rpc result------------:", envelope.to_json())
         if envelope.error.code:
             raise Exception(envelope.error)
         return json.loads(envelope.rpc.payload)

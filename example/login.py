@@ -23,7 +23,6 @@ def main():
     ))
     # result =  client.authenticate.device(id="asdfw4r1231fw3333",create=True)
     print("登录结果:", result.to_json())
-
     account = client.account.get()
     print("账号信息:", account.to_json())
 

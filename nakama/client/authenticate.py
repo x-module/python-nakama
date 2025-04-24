@@ -4,7 +4,7 @@ from retry import retry
 from nakama.common.nakama import SessionResponse, Envelope, AccountCustom, AccountDevice, AccountEmail
 
 
-def _get_params(create: bool = True, username: str = None) -> dict[str, str]:
+def getParams(create: bool = True, username: str = None) -> dict[str, str]:
     params = {}
     if create is not None:
         params["create"] = create and 'true' or 'false'
@@ -21,7 +21,7 @@ class Authenticate:
     @retry(tries=3, delay=1, backoff=2)
     def email(self, payload: AccountEmail, create: bool = None, username: str = None) -> SessionResponse:
         endpoint = "/v2/account/authenticate/email"
-        params = _get_params(create=create, username=username)
+        params = getParams(create=create, username=username)
         result = self._client.request(method=self._method, endpoint=endpoint, payload=payload.to_dict(), params=params)
         envelope = Envelope().from_dict(result)
         if envelope.error.code != 0:
@@ -32,7 +32,7 @@ class Authenticate:
     @retry(tries=3, delay=1, backoff=2)
     def custom(self, payload: AccountCustom, create: bool = None, username: str = None) -> SessionResponse:
         endpoint = "/v2/account/authenticate/custom"
-        params = _get_params(create=create, username=username)
+        params = getParams(create=create, username=username)
         result = self._client.request(method=self._method, endpoint=endpoint, payload=payload.to_dict(), params=params)
         envelope = Envelope().from_dict(result)
         if envelope.error.code != 0:
@@ -43,7 +43,7 @@ class Authenticate:
     @retry(tries=3, delay=1, backoff=2)
     def device(self, payload: AccountDevice, create: bool = None, username: str = None) -> SessionResponse:
         endpoint = "/v2/account/authenticate/device"
-        params = _get_params(create=create, username=username)
+        params = getParams(create=create, username=username)
         result = self._client.request(method=self._method, endpoint=endpoint, payload=payload.to_dict(), params=params)
         envelope = Envelope().from_dict(result)
         if envelope.error.code != 0:

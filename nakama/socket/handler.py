@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 import time
-from typing import Any, Generator
 
 from nakama.common.nakama import Envelope
 
@@ -18,15 +17,15 @@ class RequestWaiter:
 
 class RequestHandler:
     def __init__(self):
-        self.cid_count = 0
+        self.cidCount = 0
         self.requests = {}
         self.results = {}
 
     def getCid(self) -> int:
         if len(self.requests.keys()) == 0:
-            self.cid_count = 0
-        self.cid_count += 1
-        return self.cid_count
+            self.cidCount = 0
+        self.cidCount += 1
+        return self.cidCount
 
     def addRequest(self, cid: str, request: RequestWaiter):
         res = self.results.get(cid)

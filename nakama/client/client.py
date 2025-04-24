@@ -20,12 +20,12 @@ class Client(object):
             self,
             host: str = "192.168.1.190",
             port: int = 7350,
-            server_key: str = "defaultkey",
+            serverKey: str = "defaultkey",
             ssl: bool = False
     ):
         self._host = host
         self._port = port
-        self._server_key = '%s:' % server_key
+        self._serverKey = '%s:' % serverKey
         self._ssl = ssl
         self._headers = {}
 
@@ -44,7 +44,7 @@ class Client(object):
         self.initApp()
 
     def initApp(self):
-        self._headers = {"Authorization": f"Basic {base64.b64encode(self._server_key.encode()).decode()}"}
+        self._headers = {"Authorization": f"Basic {base64.b64encode(self._serverKey.encode()).decode()}"}
 
     def request(self, method: str, endpoint: str, params: Optional[dict] = None, payload: Optional[dict[str, Any]] = None) -> dict[str, Any]:
         url = f"{self.base_url}{endpoint}"

@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 import time
 
-from example.notice_handdler import NoticeHandler
+from example.notice import NoticeHandler
 from nakama import Client
 from nakama.common.nakama import AccountCustom
 from nakama.socket.socket import Socket
@@ -32,11 +32,11 @@ def main():
     socket.connect()
 
     print("----------------后续操作-----------------")
-    # create_party_result = socket.party.create(True, 20)
-    # print("create_party_result:", create_party_result.party_id)
+    create_party_result = socket.party.create(True, 20)
+    print("create_party_result:", create_party_result.party_id)
     #
 
-    result = socket.rpc("warfare/get/status")
+    result = socket.rpc("warfare/get/status",{})
     print("result:", result)
 
 

@@ -8,12 +8,13 @@ from typing import Optional, Callable, Any, Dict
 from nakama.client.client import Client
 from nakama.common.nakama import Envelope, NotificationsMsg, Notification
 from nakama.inter.notice_handler_inter import NoticeHandlerInter
-from nakama.socket.notice_handler import NoticeHandler
+from nakama.socket.notice import NoticeHandler
 from nakama.socket.party import Party
 from nakama.socket.handler import requestHandler
 from nakama.socket.rpc import Rpc
-from tools.logger import Logger
 import websocket
+
+from nakama.utils.logger import Logger
 
 
 class Socket:
@@ -43,7 +44,7 @@ class Socket:
         return f"{protocol}://{self._host}:{self._port}/ws"
 
     def setNoticeHandler(self, handler: NoticeHandlerInter):
-        self._noticeHandler.set_handler(handler)
+        self._noticeHandler.setHandler(handler)
 
     def onOpen(self, ws):
         self.logger.debug("[%s]连接成功!", self.wsUrl)
@@ -68,8 +69,8 @@ class Socket:
             requestHandler.handleResult(envelope.cid, envelope)
         else:
             msg = json.loads(message)
-            for msg_type in msg.keys():
-                self._noticeHandler.handle_event(msg_type, envelope)
+            for msgType in msg.keys():
+                self._noticeHandler.handleEvent(msgType, envelope)
 
     def connect(self):
         threading.Thread(target=self._connect).start()

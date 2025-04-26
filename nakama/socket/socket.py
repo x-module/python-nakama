@@ -64,12 +64,13 @@ class Socket:
         self.logger.debug("接收到原始消息:%s", message)
         envelope = Envelope().from_json(message)
         # 获取当前设置的消息类型
-        self.logger.debug("[%s]接受解析后消息:%s", envelope.cid, envelope.notifications)
+        self.logger.debug("接受解析后消息[%s]:%s", envelope.cid, envelope.notifications)
         if envelope.cid:
             requestHandler.handleResult(envelope.cid, envelope)
         else:
             msg = json.loads(message)
             for msgType in msg.keys():
+                self.logger.debug("普通系统消息:%s", envelope.notifications)
                 self._noticeHandler.handleEvent(msgType, envelope)
 
     def connect(self):

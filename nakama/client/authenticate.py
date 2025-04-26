@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from retry import retry
 
-from nakama.common.nakama import SessionResponse, Envelope, AccountCustom, AccountDevice, AccountEmail
+from nakama.common.nakama import SessionResponse, Envelope, AccountCustom, AccountDevice, AccountEmail,AccountSteam
 
 
 def getParams(create: bool = True, username: str = None) -> dict[str, str]:
@@ -49,7 +49,19 @@ class Authenticate:
         if envelope.error.code != 0:
             raise envelope.error
         self._client.session = SessionResponse().from_dict(result)
+        return (self._client.session
+
+    @retry(tries=3, delay=1, backoff=2))
+    def steam(self, payload: AccountSteam, create: bool = None, username: str = None) -> SessionResponse:
+        endpoint = "/v2/account/authenticate/steam"
+        params = getParams(create=create, username=username)
+        result = self._client.request(method=self._method, endpoint=endpoint, payload=payload.to_dict(), params=params)
+        envelope = Envelope().from_dict(result)
+        if envelope.error.code != 0:
+            raise envelope.error
+        self._client.session = SessionResponse().from_dict(result)
         return self._client.session
+
 
     def logout(self):
         payload = {

@@ -3,7 +3,6 @@ import base64
 from typing import Optional, Any
 
 import requests
-from tools.logger import Logger
 
 from nakama.client.account import Account
 from nakama.client.authenticate import Authenticate
@@ -13,6 +12,7 @@ from nakama.client.storage import Storage
 from nakama.common.nakama import SessionResponse
 from nakama.client.link import Link
 from nakama.client.unlink import Unlink
+from nakama.utils.logger import Logger
 
 
 class Client(object):
@@ -29,7 +29,7 @@ class Client(object):
         self._ssl = ssl
         self._headers = {}
 
-        self.logger = Logger()
+        self.logger = Logger(__name__)
 
         self._session: SessionResponse = SessionResponse()
 

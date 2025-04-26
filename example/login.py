@@ -3,20 +3,20 @@ import time
 
 from example.notice import NoticeHandler
 from nakama import Client
-from nakama.common.nakama import AccountCustom
+from nakama.common.nakama import AccountCustom, AccountSteam
 from nakama.socket.socket import Socket
 
 
 def main():
     client = Client(
-        # host="showdown-dev-02.us-east1.nakamacloud.io",
-        # port=443,
-        # server_key="wgAPTyg14PXiWwGn",
-        # ssl=True
+        host="showdown-dev-02.us-east1.nakamacloud.io",
+        port=443,
+        serverKey="wgAPTyg14PXiWwGn",
+        ssl=True
     )
     # result =  client.authenticate.email(email="aaaa@ssss.com",password="aaaa@ssss.com")
-    result = client.authenticate.custom(AccountCustom(
-        id="2341234123e412w0we34",
+    result = client.authenticate.steam(AccountSteam(
+        token="2341234123e412w0we34",
         vars={
             "aaaa": "bbbb"
         }

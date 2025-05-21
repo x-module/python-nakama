@@ -111,7 +111,7 @@ class NoticeHandler(BaseNoticeHandler):
         self.logger.debug("receive ping:%s", msg)
 
     def pong(self, msg: PongMsg):
-        self.logger.debug("receive pong:%s", msg)
+        self.logger.debug("receive pong:%s", msg.to_json())
 
     def party(self, msg: PartyMsg):
         self.logger.debug("receive party:%s", msg)

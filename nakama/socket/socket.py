@@ -8,6 +8,7 @@ from typing import Optional, Callable, Any, Dict
 from nakama.client.client import Client
 from nakama.common.nakama import Envelope, NotificationsMsg, Notification
 from nakama.inter.notice_handler_inter import NoticeHandlerInter
+from nakama.socket.match import Match
 from nakama.socket.notice import NoticeHandler
 from nakama.socket.party import Party
 from nakama.socket.handler import requestHandler
@@ -28,6 +29,7 @@ class Socket:
         self._callbacks: Dict[str, Callable] = {}
         self.rpc = Rpc(self)
         self.party = Party(self)
+        self.match = Match(self)
 
         self.logger = Logger(__name__)
         self.active = False
@@ -78,16 +80,24 @@ class Socket:
         while not self.connected:
             time.sleep(1)
 
+    def onPong(self,ws, message):
+        self.logger.debug("接收到Pong消息:%s", message)
+        self._noticeHandler.handleEvent("pong", Envelope())
     def _connect(self):
         self.logger.debug("[%s]连接中...", self.wsUrl)
         if not self._websocket:
             self._websocket = websocket.WebSocketApp(self.wsUrl,
+                                                     on_pong=self.onPong,
                                                      on_open=self.onOpen,
                                                      on_message=self.onMessage,
                                                      on_error=self.onError,
                                                      header={"Authorization": f"Bearer {self._token}"},
                                                      on_close=self.onClose)
-        self._websocket.run_forever(reconnect=1)
+        self._websocket.run_forever(
+            # reconnect=1,
+            ping_interval=3,  # 每30秒发送一次Ping
+            ping_timeout=2  # 等待Pong响应的超时时间
+        )
 
     def monitor(self):
         while self.active:

@@ -49,9 +49,9 @@ class Authenticate:
         if envelope.error.code != 0:
             raise envelope.error
         self._client.session = SessionResponse().from_dict(result)
-        return (self._client.session
+        return self._client.session
 
-    @retry(tries=3, delay=1, backoff=2))
+    @retry(tries=3, delay=1, backoff=2)
     def steam(self, payload: AccountSteam, create: bool = None, username: str = None) -> SessionResponse:
         endpoint = "/v2/account/authenticate/steam"
         params = getParams(create=create, username=username)

@@ -201,3 +201,7 @@ class NoticeHandlerInter(ABC):
     @abstractmethod
     async def partyPresenceEvent(self, msg: PartyPresenceEventMsg):
         pass
+
+    @abstractmethod
+    async def disconnect(self):
+        pass

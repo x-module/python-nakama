@@ -29,6 +29,9 @@ class NoticeHandler(BaseNoticeHandler):
     async def match(self, msg: MatchMsg):
         self.logger.debug("receive match:%s", msg)
 
+    async def disconnect(self):
+        print("----new disconnect----")
+
     async def matchData(self, msg: MatchDataMsg):
         # self.logger.debug("receive match_data:%s  data:%s", msg, msg.data.decode())
         msgData = json.loads(msg.data.decode())

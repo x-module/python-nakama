@@ -81,6 +81,8 @@ class NoticeHandler:
                 await self._handler.matchCreate(event.match_data)
             elif msgType == 'match_presence_event':
                 await self._handler.matchPresenceEvent(event.match_presence_event)
+            elif msgType == 'disconnect':
+                await self._handler.disconnect()
             else:
                 self.logger.warning("Unknown notice event msgType:%s event:%s", msgType, event)
         else:
@@ -238,3 +240,5 @@ class BaseNoticeHandler(NoticeHandlerInter):
 
     async def partyPresenceEvent(self, msg: PartyPresenceEventMsg):
         self.logger.debug("receive party_presence_event:%s", msg)
+    async def disconnect(self):
+        self.logger.debug("disconnect")

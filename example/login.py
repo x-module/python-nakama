@@ -10,7 +10,7 @@ import uuid
 
 async def login():
     client = Client(
-        host="192.168.1.55",
+        host="192.168.1.187",
         port=7350,
         serverKey="defaultkey",
         ssl=False
@@ -29,47 +29,11 @@ async def login():
     noticeHandler.setSocket(socket)
     noticeHandler.setAccount(account)
     print("=========== start join lobby ==============")
-    await joinMatch(socket, account)
-    # res = await socket.rpc("join/lobby", {
-    #     "playerId": account.user.id,
-    #     "region": "us-east-1",
-    # })
-    # print("rpc result:", res["data"]["matchId"])
-    #
-    # print("----------------后续操作-----------------")
-    # matchJoinResult = await socket.match.join(res["data"]["matchId"])
-    # print("match_join_result:", matchJoinResult.match_id)
 
     await asyncio.sleep(100000)
 
 
-async def joinMatch(socket: Socket, account: AccountResponse):
-    try:
-        res = await socket.rpc("join/lobby", {
-            "playerId": account.user.id,
-            "region": "us-east-1",
-            # "region": "ap-northeast-1",
-        })
-        print("join matchId:", res["data"]["matchId"])
-        print("----------------后续操作-----------------")
-        matchJoinResult = await socket.match.join(res["data"]["matchId"])
-        print("match_join_result:", matchJoinResult.match_id)
-        return matchJoinResult.match_id
-    except Exception as e:
-        print(e)
-        await asyncio.sleep(2)
-        return await joinMatch(socket, account)
-
-
-async def batchLogin():
-    tasks = []
-    for i in range(80):
-        print("login %d" % i)
-        task = asyncio.create_task(login())
-        tasks.append(task)
-    # 等待所有任务完成
-    await asyncio.gather(*tasks)
 
 
 if __name__ == '__main__':
-    asyncio.run(batchLogin())
+    asyncio.run(login())

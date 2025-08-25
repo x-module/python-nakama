@@ -1,9 +1,13 @@
 # -*- coding: utf-8 -*-
+import asyncio
+import base64
 import threading
 import time
 
 import json
 from typing import Optional, Callable, Any, Dict
+
+import aiohttp
 
 from nakama.client.client import Client
 from nakama.common.nakama import Envelope, NotificationsMsg, Notification
@@ -13,13 +17,13 @@ from nakama.socket.notice import NoticeHandler
 from nakama.socket.party import Party
 from nakama.socket.handler import requestHandler
 from nakama.socket.rpc import Rpc
-import websocket
 
 from nakama.utils.logger import Logger
 
 
 class Socket:
     def __init__(self, client: Client):
+        self.ws_listener_task = None
         self._host = client.host
         self._port = client.port
         self._token = client.session.token
@@ -43,71 +47,45 @@ class Socket:
     @property
     def wsUrl(self) -> str:
         protocol = "wss" if self._ssl else "ws"
-        return f"{protocol}://{self._host}:{self._port}/ws"
+        return f"{protocol}://{self._host}:{self._port}/ws?token={self._client.session.token}&format=json"
 
     def setNoticeHandler(self, handler: NoticeHandlerInter):
         self._noticeHandler.setHandler(handler)
 
-    def onOpen(self, ws):
-        self.logger.debug("[%s]连接成功!", self.wsUrl)
-        self.connected = True
-        # 状态检测线程
-        self.active = True
-        threading.Thread(target=self.monitor).start()
+    async def _websocket_listener(self, ws):
+        while True:
+            if ws.closed:
+                await self._noticeHandler.handleEvent('disconnect', None)
+                await self.close()
+                break
+            message = await ws.receive_json()
+            # print("socket message:", message)
+            if message:
+                envelope = Envelope().from_dict(message)
+                # 获取当前设置的消息类型
+                if envelope.cid:
+                    requestHandler.handleResult(envelope.cid, envelope)
+                else:
+                    for msgType in message.keys():
+                        await self._noticeHandler.handleEvent(msgType, envelope)
 
-    def onError(self, ws, error):
-        print("on_error", error)
+    async def connect(self, loop=None):
+        assert self._client.session.token is not None, 'You must set session.token'
+        if loop is None:
+            loop = asyncio.get_running_loop()
+        self._websocket = await self._client.httpSession.ws_connect(self.wsUrl)
+        if self._websocket.closed:
+            print("WebSocket is closed!")  # 检查 WebSocket 是否已关闭
+        self.ws_listener_task = loop.create_task(self._websocket_listener(self._websocket))
 
-    def onClose(self, ws, close_status_code, close_msg):
-        self.logger.debug("[%s]连接关闭!", self.wsUrl)
-        self.active = False
+    async def close(self):
+        assert self._websocket is not None, 'You must connect() before close'
+        self.ws_listener_task.cancel()
+        self.ws_listener_task = None
+        await self._websocket.close()
+        self._websocket = None
 
-    def onMessage(self, ws, message):
-        self.logger.debug("接收到原始消息:%s", message)
-        envelope = Envelope().from_json(message)
-        # 获取当前设置的消息类型
-        self.logger.debug("接受解析后消息[%s]:%s", envelope.cid, envelope.notifications)
-        if envelope.cid:
-            requestHandler.handleResult(envelope.cid, envelope)
-        else:
-            msg = json.loads(message)
-            for msgType in msg.keys():
-                self.logger.debug("普通系统消息:%s", envelope.notifications)
-                self._noticeHandler.handleEvent(msgType, envelope)
-
-    def connect(self):
-        threading.Thread(target=self._connect).start()
-        while not self.connected:
-            time.sleep(1)
-
-    def onPong(self,ws, message):
-        self.logger.debug("接收到Pong消息:%s", message)
-        self._noticeHandler.handleEvent("pong", Envelope())
-    def _connect(self):
-        self.logger.debug("[%s]连接中...", self.wsUrl)
-        if not self._websocket:
-            self._websocket = websocket.WebSocketApp(self.wsUrl,
-                                                     on_pong=self.onPong,
-                                                     on_open=self.onOpen,
-                                                     on_message=self.onMessage,
-                                                     on_error=self.onError,
-                                                     header={"Authorization": f"Bearer {self._token}"},
-                                                     on_close=self.onClose)
-        self._websocket.run_forever(
-            # reconnect=1,
-            ping_interval=3,  # 每30秒发送一次Ping
-            ping_timeout=2  # 等待Pong响应的超时时间
-        )
-
-    def monitor(self):
-        while self.active:
-            if not self._websocket.sock or not self._websocket.sock.connected:
-                self.logger.warning("检测到连接断开!")
-                self.active = False
-            time.sleep(1)
-
-    def disconnect(self) -> None:
-        """断开连接"""
-        if self._websocket:
-            self._websocket.close()
-            self._websocket = None
+    async def send(self, data):
+        assert self._websocket is not None, 'You must connect() before sending'
+        # await self._websocket.send_str(data)
+        await self._websocket.send_json(data)

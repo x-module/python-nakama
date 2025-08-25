@@ -15,6 +15,17 @@ class RequestWaiter:
         return self.res
 
 
+class WSRequestWaiter:
+
+    def __init__(self):
+        self.res = None
+
+    def __await__(self):
+        while self.res is None:
+            yield
+        return self.res
+
+
 class RequestHandler:
     def __init__(self):
         self.cidCount = 0
@@ -27,7 +38,7 @@ class RequestHandler:
         self.cidCount += 1
         return self.cidCount
 
-    def addRequest(self, cid: str, request: RequestWaiter):
+    def addRequest(self, cid: str, request: WSRequestWaiter):
         res = self.results.get(cid)
         if res is None:
             self.requests[cid] = request

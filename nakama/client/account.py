@@ -2,6 +2,7 @@
 from retry import retry
 
 from nakama.common.nakama import Envelope, AccountResponse
+from nakama.utils.utils import GetErrEnvelope
 
 
 class Account:
@@ -12,7 +13,7 @@ class Account:
     def get(self) -> AccountResponse:
         endpoint = '/v2/account'
         result = self._client.request(method="GET", endpoint=endpoint)
-        envelope = Envelope().from_dict(result)
+        envelope = GetErrEnvelope(result)
         if envelope.error.code != 0:
             raise envelope.error
         return AccountResponse().from_dict(result)

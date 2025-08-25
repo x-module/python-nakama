@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
 import asyncio
+import json
+import time
 
 from example.notice import NoticeHandler
 from nakama import Client
@@ -30,17 +32,19 @@ async def login():
     noticeHandler.setAccount(account)
     print("=========== start join lobby ==============")
     await joinMatch(socket, account)
-    # res = await socket.rpc("join/lobby", {
-    #     "playerId": account.user.id,
-    #     "region": "us-east-1",
-    # })
-    # print("rpc result:", res["data"]["matchId"])
-    #
-    # print("----------------后续操作-----------------")
-    # matchJoinResult = await socket.match.join(res["data"]["matchId"])
-    # print("match_join_result:", matchJoinResult.match_id)
-
     await asyncio.sleep(100000)
+
+
+async def playerHeartbeat(socket: Socket, matchId: str):
+    print("---start  player heartbeat---")
+    while True:
+        matchData = {
+            "id": 12223,
+            "data": "data",
+        }
+        print("---player heartbeat data---",matchData)
+        await socket.match.matchDataSend(matchId, 502, json.dumps(matchData), False)
+        await asyncio.sleep(5)
 
 
 async def joinMatch(socket: Socket, account: AccountResponse):
@@ -48,12 +52,13 @@ async def joinMatch(socket: Socket, account: AccountResponse):
         res = await socket.rpc("join/lobby", {
             "playerId": account.user.id,
             "region": "us-east-1",
-            # "region": "ap-northeast-1",
         })
-        print("join matchId:", res["data"]["matchId"])
+        matchId = res["data"]["matchId"]
+        print("join matchId:", matchId)
         print("----------------后续操作-----------------")
-        matchJoinResult = await socket.match.join(res["data"]["matchId"])
+        matchJoinResult = await socket.match.join(matchId)
         print("match_join_result:", matchJoinResult.match_id)
+        asyncio.create_task(playerHeartbeat(socket, matchId))
         return matchJoinResult.match_id
     except Exception as e:
         print(e)
@@ -63,7 +68,7 @@ async def joinMatch(socket: Socket, account: AccountResponse):
 
 async def batchLogin():
     tasks = []
-    for i in range(80):
+    for i in range(10):
         print("login %d" % i)
         task = asyncio.create_task(login())
         tasks.append(task)
@@ -73,3 +78,4 @@ async def batchLogin():
 
 if __name__ == '__main__':
     asyncio.run(batchLogin())
+    time.sleep(10000000)

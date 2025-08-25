@@ -2,6 +2,7 @@
 import base64
 from typing import Optional, Any
 
+import aiohttp
 import requests
 
 from nakama.client.account import Account
@@ -23,6 +24,7 @@ class Client(object):
             serverKey: str = "defaultkey",
             ssl: bool = False
     ):
+        self.httpSession = None
         self._host = host
         self._port = port
         self._serverKey = '%s:' % serverKey
@@ -45,6 +47,11 @@ class Client(object):
 
     def initApp(self):
         self._headers = {"Authorization": f"Basic {base64.b64encode(self._serverKey.encode()).decode()}"}
+        headers = {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json',
+        }
+        self.httpSession = aiohttp.ClientSession(headers=headers)
 
     def request(self, method: str, endpoint: str, params: Optional[dict] = None, payload: Optional[dict[str, Any]] = None) -> dict[str, Any]:
         url = f"{self.base_url}{endpoint}"
@@ -68,6 +75,7 @@ class Client(object):
         self._headers = {
             'Authorization': 'Bearer %s' % session.token
         }
+
     def logout(self):
         self.authenticate.logout()
 

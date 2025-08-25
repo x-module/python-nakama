@@ -66,7 +66,8 @@ class NoticeHandler(BaseNoticeHandler):
         self.logger.debug("receive match_leave:%s", msg)
 
     def matchPresenceEvent(self, msg: MatchPresenceEventMsg):
-        self.logger.debug("receive match_presence_event:%s", msg)
+        pass
+        # self.logger.debug("receive match_presence_event:%s", msg)
 
     def matchmakerAdd(self, msg: MatchmakerAddMsg):
         self.logger.debug("receive matchmaker_add:%s", msg)

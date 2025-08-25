@@ -7,197 +7,197 @@ from nakama.common.nakama import ChannelMsg, ChannelJoinMsg, ChannelLeaveMsg, Ch
 
 class NoticeHandlerInter(ABC):
     @abstractmethod
-    def channel(self, msg: ChannelMsg):
+    async def channel(self, msg: ChannelMsg):
         pass
 
     @abstractmethod
-    def channelJoin(self, msg: ChannelJoinMsg):
+    async def channelJoin(self, msg: ChannelJoinMsg):
         pass
 
     @abstractmethod
-    def channelLeave(self, msg: ChannelLeaveMsg):
+    async def channelLeave(self, msg: ChannelLeaveMsg):
         pass
 
     @abstractmethod
-    def channelMessage(self, msg: ChannelMessage):
+    async def channelMessage(self, msg: ChannelMessage):
         pass
 
     @abstractmethod
-    def channelMessageAck(self, msg: ChannelMessageAckMsg):
+    async def channelMessageAck(self, msg: ChannelMessageAckMsg):
         pass
 
     @abstractmethod
-    def channelMessageSend(self, msg: ChannelMessageSendMsg):
+    async def channelMessageSend(self, msg: ChannelMessageSendMsg):
         pass
 
     @abstractmethod
-    def channelMessageUpdate(self, msg: ChannelMessageUpdateMsg):
+    async def channelMessageUpdate(self, msg: ChannelMessageUpdateMsg):
         pass
 
     @abstractmethod
-    def channelMessageRemove(self, msg: ChannelMessageRemoveMsg):
+    async def channelMessageRemove(self, msg: ChannelMessageRemoveMsg):
         pass
 
     @abstractmethod
-    def channelPresenceEvent(self, msg: ChannelPresenceEventMsg):
+    async def channelPresenceEvent(self, msg: ChannelPresenceEventMsg):
         pass
 
     @abstractmethod
-    def error(self, msg: ErrorMsg):
+    async def error(self, msg: ErrorMsg):
         pass
 
     @abstractmethod
-    def match(self, msg: MatchMsg):
+    async def match(self, msg: MatchMsg):
         pass
 
     @abstractmethod
-    def matchCreate(self, msg: MatchCreateMsg):
+    async def matchCreate(self, msg: MatchCreateMsg):
         pass
 
     @abstractmethod
-    def matchData(self, msg: MatchDataMsg):
+    async def matchData(self, msg: MatchDataMsg):
         pass
 
     @abstractmethod
-    def matchDataSend(self, msg: MatchDataSendMsg):
+    async def matchDataSend(self, msg: MatchDataSendMsg):
         pass
 
     @abstractmethod
-    def matchJoin(self, msg: MatchJoinMsg):
+    async def matchJoin(self, msg: MatchJoinMsg):
         pass
 
     @abstractmethod
-    def matchLeave(self, msg: MatchLeaveMsg):
+    async def matchLeave(self, msg: MatchLeaveMsg):
         pass
 
     @abstractmethod
-    def matchPresenceEvent(self, msg: MatchPresenceEventMsg):
+    async def matchPresenceEvent(self, msg: MatchPresenceEventMsg):
         pass
 
     @abstractmethod
-    def matchmakerAdd(self, msg: MatchmakerAddMsg):
+    async def matchmakerAdd(self, msg: MatchmakerAddMsg):
         pass
 
     @abstractmethod
-    def matchmakerMatched(self, msg: MatchmakerMatchedMsg):
+    async def matchmakerMatched(self, msg: MatchmakerMatchedMsg):
         pass
 
     @abstractmethod
-    def matchmakerRemove(self, msg: MatchmakerRemoveMsg):
+    async def matchmakerRemove(self, msg: MatchmakerRemoveMsg):
         pass
 
     @abstractmethod
-    def matchmakerTicket(self, msg: MatchmakerTicketMsg):
+    async def matchmakerTicket(self, msg: MatchmakerTicketMsg):
         pass
 
     @abstractmethod
-    def notifications(self, msg: NotificationsMsg):
+    async def notifications(self, msg: NotificationsMsg):
         pass
 
     @abstractmethod
-    def rpc(self, msg: RpcMsg):
+    async def rpc(self, msg: RpcMsg):
         pass
 
     @abstractmethod
-    def status(self, msg: StatusMsg):
+    async def status(self, msg: StatusMsg):
         pass
 
     @abstractmethod
-    def statusFollow(self, msg: StatusFollowMsg):
+    async def statusFollow(self, msg: StatusFollowMsg):
         pass
 
     @abstractmethod
-    def statusPresenceEvent(self, msg: StatusPresenceEventMsg):
+    async def statusPresenceEvent(self, msg: StatusPresenceEventMsg):
         pass
 
     @abstractmethod
-    def statusUnfollow(self, msg: StatusUnfollowMsg):
+    async def statusUnfollow(self, msg: StatusUnfollowMsg):
         pass
 
     @abstractmethod
-    def statusUpdate(self, msg: StatusUpdateMsg):
+    async def statusUpdate(self, msg: StatusUpdateMsg):
         pass
 
     @abstractmethod
-    def streamData(self, msg: StreamDataMsg):
+    async def streamData(self, msg: StreamDataMsg):
         pass
 
     @abstractmethod
-    def streamPresenceEvent(self, msg: StreamPresenceEventMsg):
+    async def streamPresenceEvent(self, msg: StreamPresenceEventMsg):
         pass
 
     @abstractmethod
-    def ping(self, msg: PingMsg):
+    async def ping(self, msg: PingMsg):
         pass
 
     @abstractmethod
-    def pong(self, msg: PongMsg):
+    async def pong(self, msg: PongMsg):
         pass
 
     @abstractmethod
-    def party(self, msg: PartyMsg):
+    async def party(self, msg: PartyMsg):
         pass
 
     @abstractmethod
-    def partyCreate(self, msg: PartyCreateMsg):
+    async def partyCreate(self, msg: PartyCreateMsg):
         pass
 
     @abstractmethod
-    def partyJoin(self, msg: PartyJoinMsg):
+    async def partyJoin(self, msg: PartyJoinMsg):
         pass
 
     @abstractmethod
-    def partyLeave(self, msg: PartyLeaveMsg):
+    async def partyLeave(self, msg: PartyLeaveMsg):
         pass
 
     @abstractmethod
-    def partyPromote(self, msg: PartyPromoteMsg):
+    async def partyPromote(self, msg: PartyPromoteMsg):
         pass
 
     @abstractmethod
-    def partyLeader(self, msg: PartyLeaderMsg):
+    async def partyLeader(self, msg: PartyLeaderMsg):
         pass
 
     @abstractmethod
-    def partyAccept(self, msg: PartyAcceptMsg):
+    async def partyAccept(self, msg: PartyAcceptMsg):
         pass
 
     @abstractmethod
-    def partyRemove(self, msg: PartyRemoveMsg):
+    async def partyRemove(self, msg: PartyRemoveMsg):
         pass
 
     @abstractmethod
-    def partyClose(self, msg: PartyCloseMsg):
+    async def partyClose(self, msg: PartyCloseMsg):
         pass
 
     @abstractmethod
-    def partyJoinRequestList(self, msg: PartyJoinRequestsMsg):
+    async def partyJoinRequestList(self, msg: PartyJoinRequestsMsg):
         pass
 
     @abstractmethod
-    def partyJoinRequest(self, msg: PartyJoinRequestMsg):
+    async def partyJoinRequest(self, msg: PartyJoinRequestMsg):
         pass
 
     @abstractmethod
-    def partyMatchmakerAdd(self, msg: PartyMatchmakerAddMsg):
+    async def partyMatchmakerAdd(self, msg: PartyMatchmakerAddMsg):
         pass
 
     @abstractmethod
-    def partyMatchmakerRemove(self, msg: PartyMatchmakerRemoveMsg):
+    async def partyMatchmakerRemove(self, msg: PartyMatchmakerRemoveMsg):
         pass
 
     @abstractmethod
-    def partyMatchmakerTicket(self, msg: PartyMatchmakerTicketMsg):
+    async def partyMatchmakerTicket(self, msg: PartyMatchmakerTicketMsg):
         pass
 
     @abstractmethod
-    def partyData(self, msg: PartyDataMsg):
+    async def partyData(self, msg: PartyDataMsg):
         pass
 
     @abstractmethod
-    def partyDataSend(self, msg: PartyDataSendMsg):
+    async def partyDataSend(self, msg: PartyDataSendMsg):
         pass
 
     @abstractmethod
-    def partyPresenceEvent(self, msg: PartyPresenceEventMsg):
+    async def partyPresenceEvent(self, msg: PartyPresenceEventMsg):
         pass

@@ -3,20 +3,21 @@ import asyncio
 
 from example.notice import NoticeHandler
 from nakama import Client
-from nakama.common.nakama import AccountCustom, AccountSteam, AccountDevice, AccountResponse
+from nakama.common.nakama import AccountCustom, AccountSteam, AccountDevice, AccountResponse, AccountEmail
 from nakama.socket.socket import Socket
 import uuid
 
 
 async def login():
     client = Client(
-        host="192.168.1.55",
-        port=7350,
-        serverKey="defaultkey",
-        ssl=False
+        host="showdown-dev-02.us-east1.nakamacloud.io",
+        port=443,
+        serverKey="wgAPTyg14PXiWwGn",
+        ssl=True
     )
-    result = await client.authenticate.custom(payload=AccountDevice(
-        id=str(uuid.uuid1()),
+    result = await client.authenticate.email(payload=AccountEmail(
+        email="aaaaaaa@aaa.com",
+        password="12341234123412341234"
     ))
     print("登录结果:", result.to_json())
     account = client.account.get()
@@ -47,8 +48,8 @@ async def joinMatch(socket: Socket, account: AccountResponse):
     try:
         res = await socket.rpc("join/lobby", {
             "playerId": account.user.id,
-            "region": "us-east-1",
-            # "region": "ap-northeast-1",
+            # "region": "us-east-1",
+            "region": "ap-northeast-1",
         })
         print("join matchId:", res["data"]["matchId"])
         print("----------------后续操作-----------------")
@@ -63,7 +64,7 @@ async def joinMatch(socket: Socket, account: AccountResponse):
 
 async def batchLogin():
     tasks = []
-    for i in range(80):
+    for i in range(13):
         print("login %d" % i)
         task = asyncio.create_task(login())
         tasks.append(task)
@@ -72,4 +73,6 @@ async def batchLogin():
 
 
 if __name__ == '__main__':
-    asyncio.run(batchLogin())
+    # asyncio.run(batchLogin())
+
+    asyncio.run(  login())

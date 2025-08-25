@@ -3,7 +3,7 @@ import json
 from typing import Any
 
 from nakama.common.nakama import Envelope, RpcMsg
-from nakama.socket.handler import RequestWaiter, requestHandler
+from nakama.socket.handler import RequestWaiter, requestHandler, WSRequestWaiter
 from nakama.utils.logger import Logger
 
 
@@ -12,8 +12,9 @@ class Rpc:
         self._socket = socket
         self.logger = Logger(__name__)
 
-    def __call__(self, *args, **kwargs):
-        requestWaiter = RequestWaiter()
+    async def __call__(self, *args, **kwargs):
+        requestWaiter = WSRequestWaiter()
+
         cid = '%d' % requestHandler.getCid()
         requestHandler.addRequest(cid, requestWaiter)
         if len(args) == 0:
@@ -35,9 +36,9 @@ class Rpc:
             cid=str(cid),
         )
         self.logger.debug("rpc info:{}".format(params.rpc))
-        self._socket.websocket.send(params.to_json())
-        envelope = requestWaiter.result()
-        print("-------------call rpc result------------:", envelope.to_json())
+        await self._socket.send(params.to_dict())
+        envelope  = await  requestWaiter
+        # print("-------------call rpc result------------:", envelope.to_json())
         if envelope.error.code:
             raise Exception(envelope.error)
         return json.loads(envelope.rpc.payload)

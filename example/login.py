@@ -44,8 +44,8 @@ def main():
 
     print("----------------后续操作-----------------")
 
-    matchJoinResult = socket.match.join("c3b63857-4c21-4435-97f8-47b44b8e308f.nakama")
-    print("match_join_result:", matchJoinResult.match_id)
+    # matchJoinResult = socket.match.join("c3b63857-4c21-4435-97f8-47b44b8e308f.nakama")
+    # print("match_join_result:", matchJoinResult.match_id)
 
     # create_party_result = socket.party.create(True, 20)
     # print("create_party_result:", create_party_result.party_id)

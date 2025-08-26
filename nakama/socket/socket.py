@@ -145,7 +145,7 @@ class Socket:
         if self._websocket and not self._websocket.closed:
             await self._websocket.close()
             self._websocket = None
-        self.logger.info("WebSocket closed111")
+        self.logger.info("WebSocket closed")
 
     async def send(self, data):
         if not self._websocket or self._websocket.closed:

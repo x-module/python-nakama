@@ -240,5 +240,6 @@ class BaseNoticeHandler(NoticeHandlerInter):
 
     async def partyPresenceEvent(self, msg: PartyPresenceEventMsg):
         self.logger.debug("receive party_presence_event:%s", msg)
+
     async def disconnect(self):
         self.logger.debug("disconnect")

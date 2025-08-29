@@ -1,7 +1,8 @@
 # -*- coding: utf-8 -*-
 from retry import retry
 
-from nakama.common.nakama import SessionResponse, Envelope, AccountCustom, AccountDevice, AccountEmail,AccountSteam
+from nakama.common.nakama import SessionResponse, Envelope, AccountCustom, AccountDevice, AccountEmail, AccountSteam
+from nakama.utils.logger import Logger
 
 
 def getParams(create: bool = True, username: str = None) -> dict[str, str]:
@@ -17,6 +18,7 @@ class Authenticate:
     def __init__(self, client):
         self._client = client
         self._method = "POST"
+        self.logger = Logger(__name__)
 
     @retry(tries=3, delay=1, backoff=2)
     def email(self, payload: AccountEmail, create: bool = None, username: str = None) -> SessionResponse:
@@ -51,6 +53,7 @@ class Authenticate:
         self._client.session = SessionResponse().from_dict(result)
         return self._client.session
 
+
     @retry(tries=3, delay=1, backoff=2)
     def steam(self, payload: AccountSteam, create: bool = None, username: str = None) -> SessionResponse:
         endpoint = "/v2/account/authenticate/steam"
@@ -61,7 +64,6 @@ class Authenticate:
             raise envelope.error
         self._client.session = SessionResponse().from_dict(result)
         return self._client.session
-
 
     def logout(self):
         payload = {

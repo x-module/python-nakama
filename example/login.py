@@ -5,6 +5,7 @@ from example.notice import NoticeHandler
 from nakama import Client
 from nakama.common.nakama import AccountCustom, AccountSteam, AccountDevice
 from nakama.socket.socket import Socket
+from nakama.utils.error import handle_errors
 
 
 # Host = "192.168.1.190",
@@ -12,9 +13,11 @@ from nakama.socket.socket import Socket
 # ServerKey = "defaultkey",
 # HttpKey = "defaulthttpkey",
 # Ssl = False,
+
+@handle_errors
 def main():
     client = Client(
-        host="192.168.1.187",
+        host="192.168.1.55",
         port=7350,
         serverKey="defaultkey",
         ssl=False
@@ -33,6 +36,7 @@ def main():
     result = client.authenticate.device(payload=AccountDevice(
         id="25739443885670978"
     ))
+
     print("登录结果:", result.to_json())
     account = client.account.get()
     print("账号信息:", account.to_json())

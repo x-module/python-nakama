@@ -56,7 +56,7 @@ class Socket:
         threading.Thread(target=self.monitor).start()
 
     def onError(self, ws, error):
-        print("on_error", error)
+        print("socket connect error:", error)
 
     def onClose(self, ws, close_status_code, close_msg):
         self.logger.debug("[%s]连接关闭!", self.wsUrl)
@@ -94,9 +94,9 @@ class Socket:
                                                      header={"Authorization": f"Bearer {self._token}"},
                                                      on_close=self.onClose)
         self._websocket.run_forever(
-            # reconnect=1,
-            ping_interval=3,  # 每30秒发送一次Ping
-            ping_timeout=2  # 等待Pong响应的超时时间
+            reconnect=1,
+            ping_interval=30,  # 每30秒发送一次Ping
+            ping_timeout=10  # 等待Pong响应的超时时间
         )
 
     def monitor(self):

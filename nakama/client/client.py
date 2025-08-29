@@ -76,8 +76,8 @@ class Client(object):
             'Authorization': 'Bearer %s' % session.token
         }
 
-    def logout(self):
-        self.authenticate.logout()
+    async def logout(self):
+        await self.authenticate.logout()
 
     @property
     def base_url(self):

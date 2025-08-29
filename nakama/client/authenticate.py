@@ -1,4 +1,6 @@
 # -*- coding: utf-8 -*-
+import json
+
 from retry import retry
 
 from nakama.common.nakama import SessionResponse, Envelope, AccountCustom, AccountDevice, AccountEmail, AccountSteam
@@ -24,6 +26,7 @@ class Authenticate:
         endpoint = "/v2/account/authenticate/email"
         url = f"{self._client.base_url}{endpoint}"
         params = getParams(create=create, username=username)
+        print("login url:", url)
         async with self._client.httpSession.post(url, headers=self._client._headers, json=payload.to_dict(), params=params) as response:
             result = await response.json()
             envelope = GetErrEnvelope(result)
@@ -78,21 +81,16 @@ class Authenticate:
         if self._client.session.refresh_token:
             payload['refreshToken'] = self._client.session.refresh_token
 
-        url = '/v2/session/logout'
-
-        async with self._client.httpSession.post(url, headers=self._client._headers, json=payload.to_dict(), params=params) as response:
+        endpoint = '/v2/session/logout'
+        url = f"{self._client.base_url}{endpoint}"
+        async with self._client.httpSession.post(url, headers=self._client._headers, params=payload) as response:
             result = await response.json()
+            print("---------result:", result)
             envelope = GetErrEnvelope(result)
             if envelope.error.code != 0:
                 raise envelope.error
             self._client.session = SessionResponse().from_dict(result)
             return self._client.session
-
-
-        result = self._client.request(method="POST", endpoint=endpoint, payload=payload)
-        envelope = GetErrEnvelope(result)
-        if envelope.error.code != 0:
-            raise envelope.error
 
     def refresh(self, vars=None):
         payload = {

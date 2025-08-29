@@ -71,6 +71,8 @@ class Socket:
                     raise ws.exception()  # 主动抛出错误
         except (aiohttp.ClientConnectionError, ConnectionResetError) as e:
             self.logger.error(f"WebSocket connection lost: {e}")
+        except:
+            self.logger.error("WebSocket err")
         finally:
             # 无论何种断开都触发重连（非手动关闭时）
             await self._handle_disconnect()

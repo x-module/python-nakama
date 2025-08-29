@@ -3,7 +3,7 @@ import base64
 import json
 
 from nakama.common.nakama import Envelope, PartyMsg, MatchJoinMsg, MatchMsg, MatchDataSendMsg, UserPresenceMsg, RpcMsg, MatchLeaveMsg
-from nakama.socket.handler import RequestWaiter, requestHandler, WSRequestWaiter
+from nakama.socket.handler import  requestHandler, WSRequestWaiter
 from nakama.utils.logger import Logger
 
 

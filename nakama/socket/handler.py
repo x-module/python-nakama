@@ -3,18 +3,6 @@ import time
 
 from nakama.common.nakama import Envelope
 
-
-class RequestWaiter:
-
-    def __init__(self):
-        self.res: Envelope = None
-
-    def result(self):
-        while not self.res:
-            time.sleep(0.01)
-        return self.res
-
-
 class WSRequestWaiter:
 
     def __init__(self):

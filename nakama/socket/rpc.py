@@ -3,7 +3,7 @@ import json
 from typing import Any
 
 from nakama.common.nakama import Envelope, RpcMsg
-from nakama.socket.handler import RequestWaiter, requestHandler, WSRequestWaiter
+from nakama.socket.handler import  requestHandler, WSRequestWaiter
 from nakama.utils.logger import Logger
 
 

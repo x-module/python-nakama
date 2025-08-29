@@ -10,7 +10,7 @@ import uuid
 
 async def login():
     client = Client(
-        host="192.168.1.187",
+        host="192.168.1.55",
         port=7350,
         serverKey="defaultkey",
         ssl=False
@@ -29,7 +29,9 @@ async def login():
     noticeHandler.setSocket(socket)
     noticeHandler.setAccount(account)
     print("=========== start join lobby ==============")
-
+    await asyncio.sleep(10)
+    party = await socket.party.create(True,10)
+    print("party:{}".format(party))
     await asyncio.sleep(100000)
 
 

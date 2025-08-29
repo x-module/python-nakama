@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 from nakama.common.nakama import Envelope, PartyCreateMsg, PartyMsg
-from nakama.socket.handler import RequestWaiter, requestHandler
+from nakama.socket.handler import  requestHandler, WSRequestWaiter
 
 
 class Party:
@@ -8,7 +8,8 @@ class Party:
         self._socket = socket
 
     async def create(self, open: bool, maxSize: int) -> PartyMsg:
-        requestWaiter = RequestWaiter()
+        requestWaiter = WSRequestWaiter()
+
         cid = '%d' % requestHandler.getCid()
         requestHandler.addRequest(cid, requestWaiter)
         params = Envelope(
@@ -18,8 +19,9 @@ class Party:
             ),
             cid=str(cid),
         )
-        await self._socket.send(params.to_json())
-        envelope = requestWaiter.result()
+        print("create party params: {}".format(params))
+        await self._socket.send(params.to_dict())
+        envelope  = await  requestWaiter
         if envelope.error.code:
             raise Exception(envelope.error)
         return envelope.party

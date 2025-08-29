@@ -17,7 +17,7 @@ from nakama.utils.error import handle_errors
 @handle_errors
 def main():
     client = Client(
-        host="192.168.1.55",
+        host="127.0.0.1",
         port=7350,
         serverKey="defaultkey",
         ssl=False

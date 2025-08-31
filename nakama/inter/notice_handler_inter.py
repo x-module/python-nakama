@@ -45,6 +45,9 @@ class NoticeHandlerInter(ABC):
     @abstractmethod
     def error(self, msg: ErrorMsg):
         pass
+    @abstractmethod
+    def close(self, msg: ErrorMsg):
+        pass
 
     @abstractmethod
     def match(self, msg: MatchMsg):

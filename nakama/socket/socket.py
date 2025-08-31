@@ -6,7 +6,7 @@ import json
 from typing import Optional, Callable, Any, Dict
 
 from nakama.client.client import Client
-from nakama.common.nakama import Envelope, NotificationsMsg, Notification
+from nakama.common.nakama import Envelope, NotificationsMsg, Notification, ErrorMsg
 from nakama.inter.notice_handler_inter import NoticeHandlerInter
 from nakama.socket.match import Match
 from nakama.socket.notice import NoticeHandler
@@ -16,6 +16,9 @@ from nakama.socket.rpc import Rpc
 import websocket
 
 from nakama.utils.logger import Logger
+
+NakamaCloseCode = 100
+NakamaErrorCode = 101
 
 
 class Socket:
@@ -55,8 +58,23 @@ class Socket:
     def onError(self, ws, error):
         print("socket connect error:", error)
 
+        self._noticeHandler.handleEvent("on_close", Envelope(
+            error=ErrorMsg(
+                code=NakamaErrorCode,
+                message="Socket 异常!，error:{}".format(error)
+            )
+        ))
+
     def onClose(self, ws, close_status_code, close_msg):
-        self.logger.debug("[%s]连接关闭!，msg:[%s]", self.wsUrl,close_msg)
+        self.logger.debug("[%s]连接关闭!，msg:[%s]", self.wsUrl, close_msg)
+        self._websocket.close()
+        self._websocket = None
+        self._noticeHandler.handleEvent("on_close", Envelope(
+            error=ErrorMsg(
+                code=NakamaCloseCode,
+                message="{}连接关闭!，msg:{}".format(self.wsUrl, close_msg),
+            )
+        ))
 
     def onMessage(self, ws, message):
         self.logger.debug("接收到原始消息:%s", message)
@@ -77,9 +95,10 @@ class Socket:
         while not self.connected:
             time.sleep(1)
 
-    def onPong(self,ws, message):
+    def onPong(self, ws, message):
         self.logger.debug("接收到Pong消息:%s", message)
         self._noticeHandler.handleEvent("pong", Envelope())
+
     def _connect(self):
         self.logger.debug("[%s]连接中...", self.wsUrl)
         if not self._websocket:

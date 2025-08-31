@@ -74,6 +74,10 @@ class NoticeHandler:
                 self._handler.partyDataSend(event.party_data_send)
             elif msgType == "party_presence_event":
                 self._handler.partyPresenceEvent(event.party_presence_event)
+            elif msgType == "on_error":
+                self._handler.error(event.error)
+            elif msgType == "on_close":
+                self._handler.close(event.error)
             else:
                 self.logger.warning("Unknown notice event event:%s", event)
         else:

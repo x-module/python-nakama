@@ -30,9 +30,9 @@ class Socket:
         self.rpc = Rpc(self)
         self.party = Party(self)
         self.match = Match(self)
+        self.onError: Optional[Callable] = None,
 
         self.logger = Logger(__name__)
-        self.active = False
         self._noticeHandler = NoticeHandler()
         self.connected = False
 
@@ -51,23 +51,20 @@ class Socket:
     def onOpen(self, ws):
         self.logger.debug("[%s]连接成功!", self.wsUrl)
         self.connected = True
-        # 状态检测线程
-        self.active = True
-        threading.Thread(target=self.monitor).start()
 
     def onError(self, ws, error):
         print("socket connect error:", error)
 
     def onClose(self, ws, close_status_code, close_msg):
-        self.logger.debug("[%s]连接关闭!", self.wsUrl)
-        self.active = False
+        self.logger.debug("[%s]连接关闭!，msg:[%s]", self.wsUrl,close_msg)
 
     def onMessage(self, ws, message):
         self.logger.debug("接收到原始消息:%s", message)
         envelope = Envelope().from_json(message)
         # 获取当前设置的消息类型
-        self.logger.debug("接受解析后消息[%s]:%s", envelope.cid, envelope.notifications)
+        # self.logger.debug("接受解析后消息[%s]:%s", envelope.cid, envelope.notifications)
         if envelope.cid:
+            self.logger.debug("RPC消息:%s", envelope.notifications)
             requestHandler.handleResult(envelope.cid, envelope)
         else:
             msg = json.loads(message)
@@ -98,13 +95,6 @@ class Socket:
             ping_interval=30,  # 每30秒发送一次Ping
             ping_timeout=10  # 等待Pong响应的超时时间
         )
-
-    def monitor(self):
-        while self.active:
-            if not self._websocket.sock or not self._websocket.sock.connected:
-                self.logger.warning("检测到连接断开!")
-                self.active = False
-            time.sleep(1)
 
     def disconnect(self) -> None:
         """断开连接"""

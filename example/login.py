@@ -3,7 +3,7 @@ import time
 
 from example.notice import NoticeHandler
 from nakama import Client
-from nakama.common.nakama import AccountCustom, AccountSteam, AccountDevice
+from nakama.common.nakama import AccountCustom, AccountSteam, AccountDevice, AccountEmail
 from nakama.socket.socket import Socket
 from nakama.utils.error import handle_errors
 
@@ -26,16 +26,21 @@ def main():
         # serverKey="wgAPTyg14PXiWwGn",
         # ssl=True
     )
-    # result =  client.authenticate.email(email="aaaa@ssss.com",password="aaaa@ssss.com")
+    # result =  client.authenticate.email()
+    result = client.authenticate.email(payload=AccountEmail(
+        email="aaaa@ssss.com",
+        password="aaaa@ssss.com"
+    ), create=True, username="user")
     # result = client.authenticate.steam(AccountSteam(
     #     token="2341234123e412w0we34",
     #     vars={
     #         "aaaa": "bbbb"
     #     }
     # ))
-    result = client.authenticate.device(payload=AccountDevice(
-        id="25739443885670978"
-    ))
+
+    # result = client.authenticate.device(payload=AccountDevice(
+    #     id="25739443885670978"
+    # ))
 
     print("登录结果:", result.to_json())
     account = client.account.get()

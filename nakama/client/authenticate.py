@@ -21,7 +21,7 @@ class Authenticate:
         self.logger = Logger(__name__)
 
     @retry(tries=3, delay=1, backoff=2)
-    def email(self, payload: AccountEmail, create: bool = None, username: str = None) -> SessionResponse:
+    def email(self, payload: AccountEmail, create: bool = True, username: str = None) -> SessionResponse:
         endpoint = "/v2/account/authenticate/email"
         params = getParams(create=create, username=username)
         result = self._client.request(method=self._method, endpoint=endpoint, payload=payload.to_dict(), params=params)

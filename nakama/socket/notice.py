@@ -9,7 +9,7 @@ from nakama.utils.logger import Logger
 class NoticeHandler:
     def __init__(self):
         self.logger = Logger(__name__)
-        self._handler: NoticeHandlerInter
+        self._handler: NoticeHandlerInter = BaseNoticeHandler()
 
     def setHandler(self, handler: NoticeHandlerInter):
         self._handler = handler
@@ -88,6 +88,9 @@ class NoticeHandler:
 class BaseNoticeHandler(NoticeHandlerInter):
     def __init__(self):
         self.logger = Logger(__name__)
+
+    def close(self, msg: ErrorMsg):
+        self.logger.debug("receive ErrorMsg:%s", msg)
 
     def channel(self, msg: ChannelMsg):
         self.logger.debug("receive channel:%s", msg)

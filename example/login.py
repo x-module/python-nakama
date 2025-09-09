@@ -17,7 +17,7 @@ from nakama.utils.error import handle_errors
 @handle_errors
 def main():
     client = Client(
-        host="127.0.0.1",
+        host="192.168.1.55",
         port=7350,
         serverKey="defaultkey",
         ssl=False
@@ -27,10 +27,10 @@ def main():
         # ssl=True
     )
     # result =  client.authenticate.email()
-    result = client.authenticate.email(payload=AccountEmail(
-        email="aaaa@ssss.com",
-        password="aaaa@ssss.com"
-    ), create=True, username="user")
+    # result = client.authenticate.email(payload=AccountEmail(
+    #     email="aaaa@ssss.com",
+    #     password="aaaa@ssss.com"
+    # ), create=True, username="user")
     # result = client.authenticate.steam(AccountSteam(
     #     token="2341234123e412w0we34",
     #     vars={
@@ -38,9 +38,9 @@ def main():
     #     }
     # ))
 
-    # result = client.authenticate.device(payload=AccountDevice(
-    #     id="25739443885670978"
-    # ))
+    result = client.authenticate.device(payload=AccountDevice(
+        id="25739443885670978"
+    ))
 
     print("登录结果:", result.to_json())
     account = client.account.get()
@@ -56,8 +56,8 @@ def main():
     # matchJoinResult = socket.match.join("c3b63857-4c21-4435-97f8-47b44b8e308f.nakama")
     # print("match_join_result:", matchJoinResult.match_id)
 
-    # create_party_result = socket.party.create(True, 20)
-    # print("create_party_result:", create_party_result.party_id)
+    create_party_result = socket.party.create(True, 20)
+    print("create_party_result:", create_party_result.party_id)
     # #
     #
     # result = socket.rpc("warfare/get/status", {})

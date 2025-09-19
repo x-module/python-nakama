@@ -34,10 +34,10 @@ class Rpc:
             ),
             cid=str(cid),
         )
-        self.logger.debug("rpc info:{}".format(params.rpc))
+        # self.logger.debug("rpc info:{}".format(params.rpc))
         self._socket.websocket.send(params.to_json())
         envelope = requestWaiter.result()
-        print("-------------call rpc result------------:", envelope.to_json())
+        # print("-------------call rpc result------------:", envelope.to_json())
         if envelope.error.code:
             raise Exception(envelope.error)
         return json.loads(envelope.rpc.payload)

@@ -33,9 +33,10 @@ class Socket:
         self.rpc = Rpc(self)
         self.party = Party(self)
         self.match = Match(self)
-        self.onError: Optional[Callable] = None,
+        self.onError: Optional[Callable] = None
 
         self.logger = Logger(__name__)
+        self.active = False
         self._noticeHandler = NoticeHandler()
         self.connected = False
 
@@ -54,6 +55,9 @@ class Socket:
     def onOpen(self, ws):
         self.logger.debug("[%s]连接成功!", self.wsUrl)
         self.connected = True
+        # 状态检测线程
+        self.active = True
+        threading.Thread(target=self.monitor).start()
 
     def onError(self, ws, error):
         print("socket connect error:", error)
@@ -67,8 +71,8 @@ class Socket:
 
     def onClose(self, ws, close_status_code, close_msg):
         self.logger.debug("[%s]连接关闭!，msg:[%s]", self.wsUrl, close_msg)
-        self._websocket.close()
         self._websocket = None
+        self.active = False
         self._noticeHandler.handleEvent("on_close", Envelope(
             error=ErrorMsg(
                 code=NakamaCloseCode,
@@ -77,7 +81,7 @@ class Socket:
         ))
 
     def onMessage(self, ws, message):
-        self.logger.debug("接收到原始消息:%s", message)
+        # self.logger.debug("接收到原始消息:%s", message)
         envelope = Envelope().from_json(message)
         # 获取当前设置的消息类型
         # self.logger.debug("接受解析后消息[%s]:%s", envelope.cid, envelope.notifications)
@@ -110,10 +114,23 @@ class Socket:
                                                      header={"Authorization": f"Bearer {self._token}"},
                                                      on_close=self.onClose)
         self._websocket.run_forever(
-            reconnect=1,
+            reconnect=0,
             ping_interval=30,  # 每30秒发送一次Ping
             ping_timeout=10  # 等待Pong响应的超时时间
         )
+
+    def monitor(self):
+        while self.active:
+            if not self._websocket.sock or not self._websocket.sock.connected:
+                self.logger.error("检测到连接断开!")
+                self.active = False
+                self._noticeHandler.handleEvent("on_close", Envelope(
+                    error=ErrorMsg(
+                        code=NakamaCloseCode,
+                        message="{}连接关闭!，msg:{}".format(self.wsUrl, "unknown close"),
+                    )
+                ))
+            time.sleep(3)
 
     def disconnect(self) -> None:
         """断开连接"""

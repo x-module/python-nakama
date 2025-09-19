@@ -90,7 +90,7 @@ class BaseNoticeHandler(NoticeHandlerInter):
         self.logger = Logger(__name__)
 
     def close(self, msg: ErrorMsg):
-        self.logger.debug("receive ErrorMsg:%s", msg)
+        self.logger.error("receive ErrorMsg:%s", msg)
 
     def channel(self, msg: ChannelMsg):
         self.logger.debug("receive channel:%s", msg)

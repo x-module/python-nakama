@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+import threading
 import time
 
 from example.notice import NoticeHandler
@@ -14,6 +15,7 @@ from nakama.utils.error import handle_errors
 # HttpKey = "defaulthttpkey",
 # Ssl = False,
 
+
 @handle_errors
 def main():
     client = Client(
@@ -21,6 +23,10 @@ def main():
         port=7350,
         serverKey="defaultkey",
         ssl=False
+        # host="showdown-dev-03.us-east1.nakamacloud.io",
+        # port=443,
+        # serverKey="pmPZwvKSTecZOsVh",
+        # ssl=True
         # host="showdown-dev-02.us-east1.nakamacloud.io",
         # port=443,
         # serverKey="wgAPTyg14PXiWwGn",
@@ -56,10 +62,10 @@ def main():
     # matchJoinResult = socket.match.join("c3b63857-4c21-4435-97f8-47b44b8e308f.nakama")
     # print("match_join_result:", matchJoinResult.match_id)
 
-    create_party_result = socket.party.create(True, 20)
-    print("create_party_result:", create_party_result.party_id)
+    # create_party_result = socket.party.create(True, 20)
+    # print("create_party_result:", create_party_result.party_id)
+    # # #
     # #
-    #
     # result = socket.rpc("warfare/get/status", {})
     # print("result:", result)
 
@@ -76,8 +82,16 @@ def main():
     # }
     # create_match_result= await socket.rpc.call("swamp/matchmaker/add", params)
     # print("create_match_result:", create_match_result)
+
+    threading.Thread(target=getData).start()
+
     time.sleep(100000)
 
+
+def getData(socket):
+    print("---- 开始获取数据 ----")
+    result = socket.rpc("warfare/get/sale/goods", {})
+    print("result:", len(result))
 
 if __name__ == '__main__':
     main()

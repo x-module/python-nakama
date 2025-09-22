@@ -20,7 +20,7 @@ from nakama.utils.logger import Logger
 class Network(QNetworkAccessManager):
     def __init__(self, parent=None):
         super().__init__(parent)
-        self.logger = Logger(__name__)
+        self.logger = Logger(f"{__name__}.{self.__class__.__name__}")
         self.reply: Optional[QNetworkReply] = None
         self._onReadyRead: Optional[Callable[[QNetworkReply], None]] = None
         self._onFinished: Optional[Callable[[QNetworkReply], None]] = None

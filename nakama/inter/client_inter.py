@@ -4,13 +4,14 @@ from abc import ABC, abstractmethod
 from dataclasses import dataclass
 from dataclasses_json import dataclass_json
 
+from nakama.common.nakama import SessionResponse
 from nakama.utils.request import Network
 
 
 @dataclass_json
 @dataclass
 class LoginConfig:
-    host: str = "192.168.1.190"
+    host: str = "192.168.1.55"
     port: int = 7350
     serverKey: str = "defaultkey"
     ssl: bool = False
@@ -28,5 +29,13 @@ class ClientInter(ABC):
         pass
 
     @abstractmethod
-    def baseUrl(self)->str:
+    def baseUrl(self) -> str:
+        pass
+
+    @abstractmethod
+    def getSession(self) -> SessionResponse:
+        pass
+
+    @abstractmethod
+    def setSession(self, session: SessionResponse):
         pass

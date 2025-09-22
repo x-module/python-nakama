@@ -9,57 +9,80 @@ import time
 from typing import Dict, Any
 
 from PyQt5.QtCore import QObject, pyqtSignal, QTimer, QUrl
+from PyQt5.QtNetwork import QNetworkRequest
 from PyQt5.QtWebSockets import QWebSocket
 
+from nakama.utils.logger import Logger
+
+
+# https://blog.csdn.net/ckg3824278/article/details/151115567
 
 # 使用PyQt5内置的QWebSocket的客户端[1,4](@ref)
 class WebSocketClient(QObject):
     messageReceived: pyqtSignal = pyqtSignal(str)
     connectionChanged: pyqtSignal = pyqtSignal(bool, str)  # 连接状态信号: (是否连接, 状态信息)
 
-
-    def __init__(self, url):
+    def __init__(self, url: str="", token: str=""):
         super().__init__()
-        self.url = url
-        self.websocket = None
-        self.connected = False
-        self.reconnect_attempts = 0
-        self.max_reconnect_attempts = 10
-        self.reconnect_timer = QTimer()
-        self.reconnect_timer.timeout.connect(self._tryReconnect)
-        self.heartbeat_timer = QTimer()
-        self.heartbeat_timer.timeout.connect(self._sendHeartbeat)
-        self.last_pong_received = time.time()
-        self.pong_timeout = 15  # 心跳响应超时时间(秒)
+        self._url = url
+        self._token = token
+        self._connected = False
+        self._websocket = None
+        self._reconnectAttempts = 0
+        self._maxReconnectAttempts = 10
+        self._reconnectTimer = QTimer()
+        self._reconnectTimer.timeout.connect(self._tryReconnect)
+        self._heartbeatTimer = QTimer()
+        self._heartbeatTimer.timeout.connect(self._sendHeartbeat)
+        self._lastPongReceived = time.time()
+        self._pongTimeout = 15  # 心跳响应超时时间(秒)
+        self._logger = Logger(f"{__name__}.{self.__class__.__name__}")
+
+    def setUrl(self, url):
+        self._url = url
+
+    def setToken(self, token):
+        self._token = token
 
     def connect(self):
         """连接到WebSocket服务器"""
-        if self.websocket:
-            self.websocket.deleteLater()
+        self._logger.debug("开始Socket连接，url:%s token:%s", self._url, self._token)
+        if self._websocket:
+            self._websocket.deleteLater()
 
-        self.websocket = QWebSocket()
-        self.websocket.connected.connect(self._onConnected)
-        self.websocket.disconnected.connect(self._onDisconnected)
-        self.websocket.textMessageReceived.connect(self._onTextMessageReceived)
-        self.websocket.pong.connect(self._onPongReceived)
-        self.websocket.error.connect(lambda error: self.connectionChanged.emit(False, f"连接错误: {self.websocket.errorString()}"))
-        self.websocket.open(QUrl(self.url))
+        self._websocket = QWebSocket()
+        # self._websocket.setPingInterval(30000)  # 设置心跳间隔为30秒（单位：毫秒）
+
+        self._websocket.connected.connect(self._onConnected)
+        self._websocket.disconnected.connect(self._onDisconnected)
+        self._websocket.textMessageReceived.connect(self._onTextMessageReceived)
+        self._websocket.pong.connect(self._onPongReceived)
+        self._websocket.error.connect(lambda error: self.connectionChanged.emit(False, f"连接错误: {self._websocket.errorString()}"))
+
+        request = QNetworkRequest(QUrl(self._url))
+        # 设置 Authorization 头部
+        request.setRawHeader(b"Authorization", f"Bearer {self._token}".encode("utf-8"))
+        # 发起连接
+        self._websocket.open(request)
 
     def _onConnected(self):
         """连接成功建立时的槽函数"""
-        self.connected = True
-        self.reconnect_attempts = 0
-        self.reconnect_timer.stop()
-        self.connectionChanged.emit(True, f"已连接到 {self.url}")
+        self._logger.debug("成功建立socket连接,发送事件")
+        self._connected = True
+        self._reconnectAttempts = 0
+        self._reconnectTimer.stop()
+        self.connectionChanged.emit(True, f"已连接到 {self._url}")
 
         # 启动心跳检测
-        self.heartbeat_timer.start(10000)  # 每10秒发送一次心跳
-        self.last_pong_received = time.time()
+        self._logger.debug("启动心跳检测")
+        self._heartbeatTimer.start(10000)  # 每10秒发送一次心跳
+        self._lastPongReceived = time.time()
 
     def _onDisconnected(self):
         """连接断开时的槽函数"""
-        self.connected = False
-        self.heartbeat_timer.stop()
+        self._logger.warning("连接断开")
+        self._connected = False
+        self._heartbeatTimer.stop()
         self.connectionChanged.emit(False, "连接已断开")
 
         # 安排重连
@@ -74,40 +97,42 @@ class WebSocketClient(QObject):
 
     def _onPongReceived(self, elapsed_time, payload):
         """收到pong响应时的槽函数[1](@ref)"""
-        self.last_pong_received = time.time()
+        # self._logger.debug("收到pong响应")
+        self._lastPongReceived = time.time()
 
     def _sendHeartbeat(self):
         """发送心跳包[1](@ref)"""
-        if self.connected:
+        # self._logger.debug("发送心跳包")
+        if self._connected:
             current_time = time.time()
             # 检查上次收到pong是否超时
-            if current_time - self.last_pong_received > self.pong_timeout:
+            if current_time - self._lastPongReceived > self._pongTimeout:
                 self.connectionChanged.emit(False, "心跳超时，连接可能已断开")
-                self.websocket.abort()  # 中止连接，触发disconnected信号
+                self._websocket.abort()  # 中止连接，触发disconnected信号
             else:
-                self.websocket.ping(b"ping")
+                self._websocket.ping(b"ping")
 
     def _scheduleReconnect(self):
         """安排重连尝试"""
-        if self.reconnect_attempts < self.max_reconnect_attempts:
-            delay = min(2 ** self.reconnect_attempts, 10)  # 指数退避，最大30秒
-            self.connectionChanged.emit(False, f"{delay}秒后尝试第{self.reconnect_attempts + 1}次重连...")
-            self.reconnect_timer.start(delay * 1000)  # 转换为毫秒
+        if self._reconnectAttempts < self._maxReconnectAttempts:
+            delay = min(2 ** self._reconnectAttempts, 10)  # 指数退避，最大30秒
+            self.connectionChanged.emit(False, f"{delay}秒后尝试第{self._reconnectAttempts + 1}次重连...")
+            self._reconnectTimer.start(delay * 1000)  # 转换为毫秒
         else:
             self.connectionChanged.emit(False, "重连尝试次数超限，请手动重连")
 
     def _tryReconnect(self):
         """尝试重新连接"""
-        self.reconnect_timer.stop()
-        self.reconnect_attempts += 1
+        self._reconnectTimer.stop()
+        self._reconnectAttempts += 1
         self.connect()
 
     def sendMessage(self, message: Dict[str, Any]):
         """发送消息到服务器"""
-        if self.connected:
+        if self._connected:
             try:
                 json_message = json.dumps(message)
-                self.websocket.sendTextMessage(json_message)
+                self._websocket.sendTextMessage(json_message)
             except Exception as e:
                 self.connectionChanged.emit(False, f"发送消息失败: {str(e)}")
         else:
@@ -115,33 +140,10 @@ class WebSocketClient(QObject):
 
     def close(self):
         """关闭连接"""
-        self.reconnect_timer.stop()
-        self.heartbeat_timer.stop()
-        if self.websocket:
-            self.websocket.close()
-            self.websocket.deleteLater()
-            self.websocket = None
-
-
-
-
-from PyQt5.QtCore import QUrl
-from PyQt5.QtNetwork import QNetworkRequest
-from PyQt5.QtWebSockets import QWebSocket
-
-# 创建 WebSocket 连接
-websocket = QWebSocket()
-
-# 构造请求对象
-url = QUrl("ws://example.com/ws")  # 或 wss://
-request = QNetworkRequest(url)
-
-# 设置 Authorization 头部
-token = "your_access_token"
-request.setRawHeader(b"Authorization", f"Bearer {token}".encode("utf-8"))
-
-# 可选：设置其他头部
-request.setRawHeader(b"X-Custom-Header", b"value")
-
-# 发起连接
-websocket.open(request)
+        self._logger.debug("关闭连接")
+        self._reconnectTimer.stop()
+        self._heartbeatTimer.stop()
+        if self._websocket:
+            self._websocket.close()
+            self._websocket.deleteLater()
+            self._websocket = None

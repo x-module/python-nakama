@@ -9,7 +9,6 @@ class Logger:
         self.logger = None
         root_path = os.getcwd()
         log_dir = "{}/data/{}".format(root_path, log_dir)
-
         # 创建日志记录器
         self.logger = logging.getLogger(name)
         self.logger.setLevel(log_level)

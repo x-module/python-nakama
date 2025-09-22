@@ -8,7 +8,7 @@ from nakama.utils.logger import Logger
 
 class NoticeHandler:
     def __init__(self):
-        self.logger = Logger(__name__)
+        self.logger = Logger(f"{__name__}.{self.__class__.__name__}")
         self._handler: NoticeHandlerInter = BaseNoticeHandler()
 
     def setHandler(self, handler: NoticeHandlerInter):
@@ -87,7 +87,7 @@ class NoticeHandler:
 # 基础消息handler
 class BaseNoticeHandler(NoticeHandlerInter):
     def __init__(self):
-        self.logger = Logger(__name__)
+        self.logger = Logger(f"{__name__}.{self.__class__.__name__}")
 
     def close(self, msg: ErrorMsg):
         self.logger.error("receive ErrorMsg:%s", msg)
@@ -156,6 +156,9 @@ class BaseNoticeHandler(NoticeHandlerInter):
         self.logger.debug("receive matchmaker_ticket:%s", msg)
 
     def notifications(self, msg: NotificationsMsg):
+
+
+
         self.logger.debug("receive notifications:%s", msg)
 
     def rpc(self, msg: RpcMsg):

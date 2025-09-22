@@ -10,7 +10,7 @@ from nakama.utils.logger import Logger
 class Rpc:
     def __init__(self, socket):
         self._socket = socket
-        self.logger = Logger(__name__)
+        self.logger = Logger(f"{__name__}.{self.__class__.__name__}")
 
     def __call__(self, *args, **kwargs):
         requestWaiter = RequestWaiter()

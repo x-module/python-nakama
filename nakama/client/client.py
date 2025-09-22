@@ -18,7 +18,7 @@ class Client(ClientInter):
         self._config = config
         self._config.serverKey = '%s:' % self._config.serverKey
         self._headers = {}
-        self.logger = Logger(__name__)
+        self.logger = Logger(f"{__name__}.{self.__class__.__name__}")
 
         self.authenticate = Authenticate(self)  # 初始化应用
 
@@ -38,12 +38,10 @@ class Client(ClientInter):
         protocol = "https" if self._config.ssl else "http"
         return f"{protocol}://{self._config.host}:{self._config.port}"
 
-    @property
-    def session(self) -> SessionResponse:
+    def getSession(self) -> SessionResponse:
         return self._session
 
-    @session.setter
-    def session(self, session: SessionResponse):
+    def setSession(self, session: SessionResponse):
         self._session = session
         self._headers = {
             'Authorization': 'Bearer %s' % session.token

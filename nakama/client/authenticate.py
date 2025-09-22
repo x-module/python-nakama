@@ -20,12 +20,19 @@ from nakama.utils.request import Network
 class Authenticate:
     def __init__(self, client: ClientInter) -> None:
         self._client = client
-        self.logger = Logger(__name__)
+        self.logger = Logger(f"{__name__}.{self.__class__.__name__}")
         self._network: Network = Network()
         self._network.setOnFinished(self.onLoginFinished)
         self._onLoginError: Optional[Callable[[str], None]] = None
+        self._onLoginSuccess: Optional[Callable[[str], None]] = None
 
         self.init()
+
+    def setOnLoginError(self, fn: Callable[[str], None]):
+        self._onLoginError = fn
+
+    def setOnLoginSuccess(self, fn: Callable[[str], None]):
+        self._onLoginSuccess = fn
 
     def init(self):
         value = f"Basic {base64.b64encode(self._client.config().serverKey.encode()).decode()}"
@@ -58,5 +65,7 @@ class Authenticate:
             envelope = Envelope().from_json(result)
             if envelope.error.code != 0:
                 raise envelope.error
-            self._client.session = SessionResponse().from_json(result)
+            self._client.setSession(SessionResponse().from_json(result))
+            if self._onLoginSuccess is not None:
+                self._onLoginSuccess(result)
         reply.deleteLater()  # 销毁回复对象

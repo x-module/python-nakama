@@ -6,6 +6,7 @@ from nakama.common.nakama import Envelope, ErrorMsg
 from nakama.inter import ClientInter
 from nakama.socket.handler import requestHandler
 from nakama.socket.notice import NoticeHandler
+from nakama.socket.party import Party
 from nakama.utils.logger import Logger
 from nakama.utils.websocket import WebSocketClient
 
@@ -21,6 +22,11 @@ class Socket(WebSocketClient):
 
         self.logger = Logger(f"{__name__}.{self.__class__.__name__}")
         self._noticeHandler = NoticeHandler()
+
+
+        self.party = Party(self)
+
+
         self.init()
 
     def init(self):
@@ -79,10 +85,10 @@ class Socket(WebSocketClient):
         ))
 
     def onMessageReceived(self, message):
-        # self.logger.debug("接收到原始消息:%s", message)
+        self.logger.debug("接收到原始消息:%s", message)
         envelope = Envelope().from_json(message)
         # 获取当前设置的消息类型
-        # self.logger.debug("接受解析后消息[%s]:%s", envelope.cid, envelope.notifications)
+        self.logger.info("接受解析后消息[%s]:%s", envelope.cid, envelope)
         if envelope.cid:
             self.logger.debug("RPC消息:%s", envelope.notifications)
             requestHandler.handleResult(envelope.cid, envelope)

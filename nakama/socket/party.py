@@ -7,7 +7,7 @@ class Party:
     def __init__(self, socket):
         self._socket = socket
 
-    def create(self, open: bool, maxSize: int) -> PartyMsg:
+    def create(self, open: bool = True, maxSize: int = 10):
         requestWaiter = RequestWaiter()
         cid = '%d' % requestHandler.getCid()
         requestHandler.addRequest(cid, requestWaiter)
@@ -18,8 +18,4 @@ class Party:
             ),
             cid=str(cid),
         )
-        self._socket.websocket.send(params.to_json())
-        envelope = requestWaiter.result()
-        if envelope.error.code:
-            raise Exception(envelope.error)
-        return envelope.party
+        self._socket.sendMessage(params.to_dict())

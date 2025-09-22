@@ -22,7 +22,7 @@ class WebSocketClient(QObject):
     messageReceived: pyqtSignal = pyqtSignal(str)
     connectionChanged: pyqtSignal = pyqtSignal(bool, str)  # 连接状态信号: (是否连接, 状态信息)
 
-    def __init__(self, url: str="", token: str=""):
+    def __init__(self, url: str = "", token: str = ""):
         super().__init__()
         self._url = url
         self._token = token
@@ -130,9 +130,9 @@ class WebSocketClient(QObject):
     def sendMessage(self, message: Dict[str, Any]):
         """发送消息到服务器"""
         if self._connected:
+            self._logger.debug("发送消息到服务器:{}".format(json.dumps(message)))
             try:
-                json_message = json.dumps(message)
-                self._websocket.sendTextMessage(json_message)
+                self._websocket.sendTextMessage(json.dumps(message))
             except Exception as e:
                 self.connectionChanged.emit(False, f"发送消息失败: {str(e)}")
         else:

@@ -94,6 +94,7 @@ class ColoredLogViewer(QTextEdit):
 class LogViewerWindow(QMainWindow):
     def __init__(self):
         super().__init__()
+        self.socket = None
         self.progressDialog = None
         self.logger = ColoredLogViewer()
         self.client = Client()
@@ -103,7 +104,7 @@ class LogViewerWindow(QMainWindow):
 
     def init_ui(self):
         """初始化用户界面"""
-        self.setWindowTitle("分布式日志查看器")
+        self.setWindowTitle("Demo")
         self.setGeometry(100, 100, 1200, 800)
 
         self.progressDialog = QProgressBar(self)
@@ -124,9 +125,14 @@ class LogViewerWindow(QMainWindow):
         # 服务选择栏
         control_layout = QHBoxLayout()
 
-        self.login = QPushButton("login")
+        self.login = QPushButton("AccountLogin")
         self.login.clicked.connect(self.onLogin)
+
+        self.party = QPushButton("CreateParty")
+        self.party.clicked.connect(self.onCreateParty)
+
         control_layout.addWidget(self.login)
+        control_layout.addWidget(self.party)
         control_layout.addStretch()
         layout.addLayout(control_layout)
 
@@ -134,6 +140,9 @@ class LogViewerWindow(QMainWindow):
 
         layout.addWidget(self.progressDialog)
         layout.addWidget(self.logger)
+
+    def onCreateParty(self):
+        self.socket.party.create(True, 20)
 
     def onLogin(self):
         self.progressDialog.setMaximum(100)
@@ -148,10 +157,10 @@ class LogViewerWindow(QMainWindow):
     def loginSuccess(self, result: str):
         self.logger.info("登录nakama服务成功!")
         self.logger.debug("开始建立socket连接")
-        socket = Socket(self.client)
-        socket.setOnClose(self.onClose)
-        socket.setOnConnect(self.onConnect)
-        socket.connect()
+        self.socket = Socket(self.client)
+        self.socket.setOnClose(self.onClose)
+        self.socket.setOnConnect(self.onConnect)
+        self.socket.connect()
 
     def onConnect(self, message):
         self.status_label.setText(f"状态: 已连接 - {message}")

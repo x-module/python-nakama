@@ -14,7 +14,6 @@ class RequestWaiter:
             time.sleep(0.01)
         return self.res
 
-
 class RequestHandler:
     def __init__(self):
         self.cidCount = 0

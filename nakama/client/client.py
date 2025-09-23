@@ -3,6 +3,7 @@ import base64
 
 from PyQt5.QtNetwork import QNetworkRequest
 
+from nakama.client.account import Account
 from nakama.client.authenticate import Authenticate
 from nakama.common.nakama import SessionResponse
 from nakama.inter.client_inter import LoginConfig, ClientInter
@@ -21,6 +22,7 @@ class Client(ClientInter):
         self.logger = Logger(f"{__name__}.{self.__class__.__name__}")
 
         self.authenticate = Authenticate(self)  # 初始化应用
+        self.account = Account(self)
 
         self.initApp()
 

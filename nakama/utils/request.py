@@ -26,15 +26,13 @@ class Network(QNetworkAccessManager):
         self._onFinished: Optional[Callable[[QNetworkReply], None]] = None
         self._errorOccurred: Optional[Callable[[QNetworkReply.NetworkError], None]] = None
         self._sslErrors: Optional[Callable[[Iterable[QSslError]], None]] = None
-
         self.request: QNetworkRequest = QNetworkRequest()
-
         self.onReadyRead()
 
     def getRequest(self, url: str) -> None:
         """发起 GET 请求"""
-        request = QNetworkRequest(QUrl(url))
-        self.reply = self.get(request)
+        self.request.setUrl(QUrl(url))
+        self.reply = self.get(self.request)
         self.reply.readyRead.connect(self.onReadyRead)
         self.reply.finished.connect(self.onFinished)
         self.reply.errorOccurred.connect(self.errorOccurred)

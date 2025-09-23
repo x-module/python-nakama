@@ -11,7 +11,7 @@ from PyQt5.QtGui import QTextCursor, QColor, QTextCharFormat
 from PyQt5.QtWebSockets import QWebSocket
 
 from nakama import Client, Socket
-from nakama.common.nakama import AccountEmail, PartyMsg
+from nakama.common.nakama import AccountEmail, PartyMsg, AccountResponse
 
 
 # 带彩色显示的日志文本框
@@ -94,6 +94,8 @@ class ColoredLogViewer(QTextEdit):
 class LogViewerWindow(QMainWindow):
     def __init__(self):
         super().__init__()
+        self.usernameValue = None
+        self.uidValue = None
         self.socket: Socket = None
         self.progressDialog = None
         self.logger = ColoredLogViewer()
@@ -131,9 +133,27 @@ class LogViewerWindow(QMainWindow):
         self.party = QPushButton("CreateParty")
         self.party.clicked.connect(self.onCreateParty)
 
+        self.account = QPushButton("GetAccount")
+        self.account.clicked.connect(self.onGetAccount)
+
         control_layout.addWidget(self.login)
         control_layout.addWidget(self.party)
+        control_layout.addWidget(self.account)
         control_layout.addStretch()
+
+        account_layout = QHBoxLayout()
+        uidLabel = QLabel("UID")
+        self.uidValue = QLabel("")
+        account_layout.addSpacing(20)
+        account_layout.addWidget(uidLabel)
+        account_layout.addWidget(self.uidValue)
+        account_layout.addSpacing(50)
+        usernameLabel = QLabel("Username:")
+        self.usernameValue = QLabel("")
+        account_layout.addWidget(usernameLabel)
+        account_layout.addWidget(self.usernameValue)
+        account_layout.addStretch()
+        layout.addLayout(account_layout)
         layout.addLayout(control_layout)
 
         # 日志显示区域
@@ -141,11 +161,22 @@ class LogViewerWindow(QMainWindow):
         layout.addWidget(self.progressDialog)
         layout.addWidget(self.logger)
 
-    def onCreateParty(self):
-        self.socket.party.create(True, 20,self.createPartyRes)
+    def onGetAccount(self):
+        self.client.account.get(self.onGetAccountSuccess, self.onGetAccountError)
 
-    def createPartyRes(self, party:PartyMsg):
-        self.logger.info(f"创建Party成功，partyId:%s - {party.party_id}")
+    def onGetAccountSuccess(self, data: AccountResponse):
+        self.logger.info(f"获取玩家数据成功，data: - {data.user.id}")
+        self.uidValue.setText(data.user.id)
+        self.usernameValue.setText(data.user.username)
+
+    def onGetAccountError(self, error):
+        self.logger.error(f"获取玩家数失败，error: - {error}")
+
+    def onCreateParty(self):
+        self.socket.party.create(True, 20, self.createPartyRes)
+
+    def createPartyRes(self, party: PartyMsg):
+        self.logger.info(f"创建Party成功，partyId: - {party.party_id}")
 
     def onLogin(self):
         self.progressDialog.setMaximum(100)

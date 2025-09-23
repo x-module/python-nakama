@@ -29,3 +29,6 @@ class Party:
     def createResult(self, cid: int, result: Envelope):
         if cid in self._request:
             self._request[cid](result.party)
+            del self._request[cid]
+        else:
+            self._logger.error("创建party的请求不存在，cid:%s", cid)

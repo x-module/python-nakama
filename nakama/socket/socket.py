@@ -7,6 +7,7 @@ from nakama.inter import ClientInter
 from nakama.socket.handler import requestHandler
 from nakama.socket.notice import NoticeHandler
 from nakama.socket.party import Party
+from nakama.socket.rpc import Rpc
 from nakama.utils.logger import Logger
 from nakama.utils.websocket import WebSocketClient
 
@@ -23,9 +24,8 @@ class Socket(WebSocketClient):
         self.logger = Logger(f"{__name__}.{self.__class__.__name__}")
         self._noticeHandler = NoticeHandler()
 
-
         self.party = Party(self)
-
+        self.rpc = Rpc(self)
 
         self.init()
 

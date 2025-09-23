@@ -23,7 +23,6 @@ class Party:
         )
         self._socket.sendMessage(params.to_dict())
         self._request[cid] = callback
-
         requestHandler.addRequest(cid, self.createResult)
 
     def createResult(self, cid: int, result: Envelope):

@@ -136,9 +136,13 @@ class LogViewerWindow(QMainWindow):
         self.account = QPushButton("GetAccount")
         self.account.clicked.connect(self.onGetAccount)
 
+        self.rpc = QPushButton("RPC")
+        self.rpc.clicked.connect(self.onRpcRequest)
+
         control_layout.addWidget(self.login)
         control_layout.addWidget(self.party)
         control_layout.addWidget(self.account)
+        control_layout.addWidget(self.rpc)
         control_layout.addStretch()
 
         account_layout = QHBoxLayout()
@@ -176,6 +180,12 @@ class LogViewerWindow(QMainWindow):
         self.socket.party.create(True, 20, self.createPartyRes)
 
     def createPartyRes(self, party: PartyMsg):
+        self.logger.info(f"创建Party成功，partyId: - {party.party_id}")
+
+    def onRpcRequest(self):
+        self.socket.rpc(True, 20, self.onRpcRequestRes)
+
+    def onRpcRequestRes(self, party: PartyMsg):
         self.logger.info(f"创建Party成功，partyId: - {party.party_id}")
 
     def onLogin(self):

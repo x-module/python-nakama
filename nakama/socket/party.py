@@ -1,16 +1,19 @@
 # -*- coding: utf-8 -*-
+from typing import Optional, Callable
+
 from nakama.common.nakama import Envelope, PartyCreateMsg, PartyMsg
-from nakama.socket.handler import RequestWaiter, requestHandler
+from nakama.socket.handler import requestHandler
+from nakama.utils.logger import Logger
 
 
 class Party:
     def __init__(self, socket):
         self._socket = socket
+        self._request = {}
+        self._logger = Logger(f"{__name__}.{self.__class__.__name__}")
 
-    def create(self, open: bool = True, maxSize: int = 10):
-        requestWaiter = RequestWaiter()
+    def create(self, open: bool, maxSize: int, callback: Callable[[PartyMsg], None]):
         cid = '%d' % requestHandler.getCid()
-        requestHandler.addRequest(cid, requestWaiter)
         params = Envelope(
             party_create=PartyCreateMsg(
                 open=open,
@@ -19,3 +22,10 @@ class Party:
             cid=str(cid),
         )
         self._socket.sendMessage(params.to_dict())
+        self._request[cid] = callback
+
+        requestHandler.addRequest(cid, self.createResult)
+
+    def createResult(self, cid: int, result: Envelope):
+        if cid in self._request:
+            self._request[cid](result.party)

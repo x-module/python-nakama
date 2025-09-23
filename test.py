@@ -11,7 +11,7 @@ from PyQt5.QtGui import QTextCursor, QColor, QTextCharFormat
 from PyQt5.QtWebSockets import QWebSocket
 
 from nakama import Client, Socket
-from nakama.common.nakama import AccountEmail
+from nakama.common.nakama import AccountEmail, PartyMsg
 
 
 # 带彩色显示的日志文本框
@@ -94,7 +94,7 @@ class ColoredLogViewer(QTextEdit):
 class LogViewerWindow(QMainWindow):
     def __init__(self):
         super().__init__()
-        self.socket = None
+        self.socket: Socket = None
         self.progressDialog = None
         self.logger = ColoredLogViewer()
         self.client = Client()
@@ -142,7 +142,10 @@ class LogViewerWindow(QMainWindow):
         layout.addWidget(self.logger)
 
     def onCreateParty(self):
-        self.socket.party.create(True, 20)
+        self.socket.party.create(True, 20,self.createPartyRes)
+
+    def createPartyRes(self, party:PartyMsg):
+        self.logger.info(f"创建Party成功，partyId:%s - {party.party_id}")
 
     def onLogin(self):
         self.progressDialog.setMaximum(100)

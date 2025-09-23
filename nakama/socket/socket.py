@@ -88,7 +88,7 @@ class Socket(WebSocketClient):
         # self.logger.debug("接收到原始消息:%s", message)
         envelope = Envelope().from_json(message)
         # 获取当前设置的消息类型
-        # self.logger.info("接受解析后消息[%s]:%s", envelope.cid, envelope)
+        self.logger.info("接受解析后消息[%s]:%s", envelope.cid, envelope)
         if envelope.cid:
             self.logger.debug("RPC消息:%s", envelope.notifications)
             requestHandler.handleResult(envelope.cid, envelope)
@@ -97,3 +97,4 @@ class Socket(WebSocketClient):
             for msgType in msg.keys():
                 self.logger.info("普通系统消息:%s", envelope.notifications)
                 self._noticeHandler.handleEvent(msgType, envelope)
+

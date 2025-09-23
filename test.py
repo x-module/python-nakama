@@ -11,7 +11,7 @@ from PyQt5.QtGui import QTextCursor, QColor, QTextCharFormat
 from PyQt5.QtWebSockets import QWebSocket
 
 from nakama import Client, Socket
-from nakama.common.nakama import AccountEmail, PartyMsg, AccountResponse
+from nakama.common.nakama import AccountEmail, PartyMsg, AccountResponse, RpcMsg, ErrorMsg
 
 
 # 带彩色显示的日志文本框
@@ -183,10 +183,14 @@ class LogViewerWindow(QMainWindow):
         self.logger.info(f"创建Party成功，partyId: - {party.party_id}")
 
     def onRpcRequest(self):
-        self.socket.rpc(True, 20, self.onRpcRequestRes)
+        self.socket.rpc("warfare/is/beginner", {}, self.onRpcRequestSuccess, self.onRpcRequestError)
 
-    def onRpcRequestRes(self, party: PartyMsg):
-        self.logger.info(f"创建Party成功，partyId: - {party.party_id}")
+    def onRpcRequestSuccess(self, result: RpcMsg):
+        self.logger.info(f"请求RPC成功，partyId: - {result}")
+
+    def onRpcRequestError(self, error: ErrorMsg):
+
+        self.logger.info(f"请求RPC失败，partyId: - {error.message}")
 
     def onLogin(self):
         self.progressDialog.setMaximum(100)
